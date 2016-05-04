@@ -47,7 +47,7 @@ else:
 logging.info("Program started with CLI options: " + str(args))
 
 cfg = configparser.ConfigParser()
-#fileOK = cfg.read(ConfigFile.config_file)
+# fileOK = cfg.read(ConfigFile.config_file)
 fileOK = cfg.read(args.CONFIG)
 if fileOK:
     print("ini file read in tcp_server = " + str(fileOK))
@@ -60,7 +60,7 @@ else:
 
 
 def decodeVIN(recv):
-        #print("recv=" + recv)
+        # print("recv=" + recv)
         if recv == "":
             return "Error"
         if isinstance(recv, bytes):
@@ -72,7 +72,7 @@ def decodeVIN(recv):
         recv = recv.replace("\r", "")  # strip CR's
         recv = recv[:34] # only 17 characters
         # recv = 2*'30' # testing only
-        #print("recv=" + recv)
+        # print("recv=" + recv)
         # VIN is 17 characters
         try:
             temp = binascii.unhexlify(recv)  # generate ascii characters from the hex values
@@ -82,7 +82,7 @@ def decodeVIN(recv):
             return "Error"
         print("recv2=" + str(temp))
         vin = temp.decode("ascii")  # encode as ASCII - done
-        #logging.info("Got VIN:" + vin)
+        # logging.info("Got VIN:" + vin)
         return vin
 
 
@@ -105,7 +105,7 @@ def doCommand(command):
         oobd.disconnect()
     elif command[:12] == "configureCAN":
         logging.info("+++++Trying configure command: " + command + "...")
-        #command line config = configureCAN,sss,tt:ID | sss=[125,500] tt=[hs,ms]
+        # command line config = configureCAN,sss,tt:ID | sss=[125,500] tt=[hs,ms]
         print("Configure CAN...")
         CAN_bus_type = cfg['CAN']['busType']
         CAN_speed = cfg['CAN']['speed']
@@ -260,7 +260,7 @@ def doCommand(command):
        # print("Command result =" + answer)
 # Read Data out of the config file...
 
-#commands = b299mca_cancodes.canFunctionSets
+# commands = b299mca_cancodes.canFunctionSets
 
 if args.server and args.command is None and not args.interactive and not args.list_commands:
     logging.debug("Starting in server mode!")

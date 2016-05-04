@@ -1,6 +1,9 @@
 from tkinter import *
 import tkinter.messagebox
 import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as font
+
 import subprocess
 from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE
 import os
@@ -13,8 +16,8 @@ cfg = configparser.ConfigParser()
 engineering_mode = False
 command_error = False
 # set defaults for the size
-sizex = "320"
-sizey = "400"
+default_sizex = "320"
+default_sizey = "400"
 fileOK = ""
 MasterVol1 = 1
 MasterVol2 = 16
@@ -48,8 +51,8 @@ def LoadConfig(filetoload):
         if not cfg.has_section('SIZE'):
             cfg.add_section('SIZE')
             # set default size
-            sizex = "320"
-            sizey = "400"
+            sizex = default_sizex
+            sizey = default_sizey
             print("cfg section SIZE not found -  to be added!!")
         # else just return the the value of globle->settings
         else:
@@ -57,6 +60,8 @@ def LoadConfig(filetoload):
             sizey = cfg['SIZE']['Y']
             print ("Size x =" + sizex + " Size y =" + sizey)
 
+        # change the window to the defined size
+        root.geometry("%sx%s" % (sizex, sizey))
 
     else:
         print("Missing Config File!!" + str(fileOK))
@@ -722,6 +727,22 @@ def get_VIN_BCM():
         command_error = False
 
 
+def get_VIN_RCM():
+    if not User_Connect:
+        tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
+        return
+    global command_error
+    command_error = False
+    print("Get VIN rcm")
+    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','readVINrcm'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
+
 def get_VIN_IPC():
     if not User_Connect:
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
@@ -1002,7 +1023,7 @@ class App:
     def __init__(self, master):
         self.frame = Frame(master, relief=SUNKEN)
         # master.geometry("320x400")
-        master.geometry("%sx%s" % (sizex, sizey))
+        master.geometry("%sx%s" % (default_sizex, default_sizey))
         master.title("CAN Invader Script Controller")
         master.bind("<Button-1>", left_mouse)
         master.bind("<Button-3>", right_mouse)
@@ -1071,68 +1092,72 @@ class App:
         self.getVINipc_b.pack()
         self.getVINipc_b.place(rely=.28, relx=.81)
 
+        self.getVINrcm_b = Button(master, text="VIN RCM", command=get_VIN_RCM, fg="white", bg="brown")
+        self.getVINrcm_b.pack()
+        self.getVINrcm_b.place(rely=.33, relx=.62)
+
         self.setFreq_b = Button(master, text="Set Freq", command=set_freq, fg="blue", bg="orange")
         self.setFreq_b.pack()
         self.setFreq_b.place(rely=.12, relx=.63)
         # creat tool tips here
         setFreq_b_ttp = CreateToolTip(self.setFreq_b, "Use box to enter optional frequency. If blank default used.")
 
-        self.setVol1_b = Button(master, text="Vol=1", command=set_vol1, fg="white", bg="green")
+        self.setVol1_b = Button(master, text="Vol=1", command=set_vol1, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol1_b.pack()
         self.setVol1_b.place(rely=.36, relx=0)
         setVol1_b_ttp = CreateToolTip(self.setVol1_b, "Use + and - to adjust the value of this button.")
 
-        self.setVol5_b = Button(master, text="Vol=5", command=set_vol5, fg="white", bg="green")
+        self.setVol5_b = Button(master, text="Vol=5", command=set_vol5, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol5_b.pack()
         self.setVol5_b.place(rely=.36, relx=.14)
 
-        self.setVol16_b = Button(master, text="Vol=16", command=set_vol16, fg="white", bg="green")
+        self.setVol16_b = Button(master, text="Vol=16", command=set_vol16, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol16_b.pack()
         self.setVol16_b.place(rely=.36, relx=.28)
         setVol16_b_ttp = CreateToolTip(self.setVol16_b, "Use < and > to adjust the value of this button.")
 
-        self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green")
+        self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green",height=3, width=6)
         self.setVol19_b.pack()
         self.setVol19_b.place(rely=.36, relx=.44)
 
-        self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green")
+        self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green",height=3, width=6)
         self.setVol22_b.pack()
         self.setVol22_b.place(rely=.36, relx=.6)
 
-        self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green")
+        self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green",height=3, width=6)
         self.setVolX_b.pack()
         self.setVolX_b.place(rely=.36, relx=.76)
         setVolX_b_ttp = CreateToolTip(self.setVolX_b, "Enter steps in box to right. If blank then 0 is used")
 
-        self.speakerLF_b = Button(master, text="Speaker LF", command=speaker_LF, fg="white", bg="black")
+        self.speakerLF_b = Button(master, text="Speaker LF", command=speaker_LF, fg="white", bg="black",height=3, width=8)
         self.speakerLF_b.pack()
         self.speakerLF_b.place(rely=.45, relx=.14)
         speakerLF_b_ttp = CreateToolTip(self.speakerLF_b, "Enable LEFT FRONT speaker only")
 
-        self.speakerCenter_b = Button(master, text="Speaker Center", command=speaker_Center, fg="white", bg="black")
+        self.speakerCenter_b = Button(master, text="Speaker Center", command=speaker_Center, fg="white", bg="black",height=3, width = 6)
         self.speakerCenter_b.pack()
         self.speakerCenter_b.place(rely=.45, relx=.36)
 
-        self.speakerRF_b = Button(master, text="Speaker RF", command=speaker_RF, fg="white", bg="black")
+        self.speakerRF_b = Button(master, text="Speaker RF", command=speaker_RF, fg="white", bg="black",height=3, width = 6)
         self.speakerRF_b.pack()
         self.speakerRF_b.place(rely=.45, relx=.66)
         speakerRF_b_ttp = CreateToolTip(self.speakerRF_b, "Enable RIGHT FRONT speaker only")
 
-        self.speakerRR_b = Button(master, text="Speaker RR", command=speaker_RR, fg="white", bg="black")
+        self.speakerRR_b = Button(master, text="Speaker RR", command=speaker_RR, fg="white", bg="black",height=3, width = 6)
         self.speakerRR_b.pack()
         self.speakerRR_b.place(rely=.57, relx=.66)
         speakerRR_b_ttp = CreateToolTip(self.speakerRR_b, "Enable RIGHT REAR speaker only")
 
-        self.speakerSub_b = Button(master, text="Speaker Sub", command=speaker_Sub, fg="white", bg="black")
+        self.speakerSub_b = Button(master, text="Speaker Sub", command=speaker_Sub, fg="white", bg="black",height=3, width = 6)
         self.speakerSub_b.pack()
         self.speakerSub_b.place(rely=.57, relx=.39)
 
-        self.speakerLR_b = Button(master, text="Speaker LR", command=speaker_LR, fg="white", bg="black")
+        self.speakerLR_b = Button(master, text="Speaker LR", command=speaker_LR, fg="white", bg="black",height=3, width = 6)
         self.speakerLR_b.pack()
         self.speakerLR_b.place(rely=.57, relx=.14)
         speakerLR_b_ttp = CreateToolTip(self.speakerLR_b, "Enable LEFT REAR speaker only")
 
-        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black")
+        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black",height=3, width = 6)
         self.speakerAll_b.pack()
         self.speakerAll_b.place(rely=.68, relx=.39)
         speakerAll_b_ttp = CreateToolTip(self.speakerAll_b, "Turn all speakers on to original setting")
@@ -1180,6 +1205,8 @@ class CreateToolTip(object):
     def close(self, event=None):
         if self.tw:
             self.tw.destroy()
+# ==================================================================================================================
+# ==================================================================================================================
 
 # create global variable for the configuration file
 User_Connect = False
@@ -1192,10 +1219,8 @@ ocolor = root.cget('bg')
 info_l1 = Label(root, textvariable=loaded_config)
 info_l1.pack(side=TOP)
 
-
-# Load the configuration file if present
-# LoadConfig(ConfigFile.config_file)
-
+# Define fonts to use
+font1 = font.Font(family='Helvetica', size='14')
 
 tpid = Entry(root, bd =2, width=3)
 tpid.pack()
@@ -1348,13 +1373,16 @@ menubar.add_cascade(label='Help', menu=Help_menu)
 # display the menu
 root.config(menu=menubar)
 
+
 # Calls the app class above
 app = App(root)
+
 
 # hide engineering mode things
 Hide(True)
 
-# Load the configuration file if present
+
+# Load the configuration file if present - needs to be done after to App(root) and Hide(True) to allow hiding/showing for the buttons
 LoadConfig(ConfigFile.config_file)
 
 root.mainloop()

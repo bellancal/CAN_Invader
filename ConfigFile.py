@@ -15,18 +15,20 @@ config_list.append("oobd_control_CD520.ini") # index = 5 #use IPC for VIN on C52
 config_list.append("oobd_control_CD539.ini") # index = 6 hs, visteon, sp=1
 config_list.append("oobd_control_V408.ini") # index = 7  hs, panasonic, sp=1 abs=?
 config_list.append("oobd_control_U502.ini") # index = 8 # use ABS for VIN  ms, clarion, sp=2
-config_list.append("oobd_control_P552.ini") # index = 9
+config_list.append("oobd_control_P552.ini") # index = 9 # use ms, clarion, sp=2, SYNC for VIN works in the GEN1.1 GEN2/3?? ABS does NOT work!!! RCM works too
 # config_list.append("oobd_control_????.ini") # index = 10
 config_list.append("test.ini") # index = last - DO NOT USE TEST ONLY
 
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
-# !!!!!!!CHANGE the number only from 0 to 7 !!!!!!
-config_file = config_list[1] # use index above in place of the number [x]
+index = 9
+# !!!!!!!CHANGE the number only using index define above !!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
+
+config_file = config_list[index] # use index above in place of the number [x]
 
 # Below are the global variables used for the modules in the project DO NOT CHANGE
 global User_AHU_Selection

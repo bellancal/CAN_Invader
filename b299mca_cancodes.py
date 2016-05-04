@@ -288,12 +288,12 @@ def cancodes_init(config_file):
                           "data": '7fffffff'}
 
     # reads VIN stored in AHU
-    read_vin_ahu = {"reqID": '727',
-                "cmd": '22',
-                "DID": 'f190',
-                "parameter": '',
-                "access": '',
-                "data": ''}  # defined later
+    read_vin_rcm = {"reqID": '737',
+                    "cmd": '22',
+                    "DID": 'f190',
+                    "parameter": '',
+                    "access": '',
+                    "data": ''}  # defined later
 
     # reads VIN stored in SYNC
     read_vin_sync = {"reqID": '7D0',
@@ -369,6 +369,7 @@ def cancodes_init(config_file):
                        "setBassX": set_bass_x_pana,  # x in hex
                        "setTrebX": set_treb_x_pana,  # x in hex
                        "readVIN": read_vin_ahu,
+                       "readVINrcm": read_vin_rcm,
                        "readVINsync": read_vin_sync,  # sends VIN command to SYNC
                        "readVINabs": read_vin_abs,  # sends VIN command to abs
                        "readVINbcm": read_vin_bcm,  # sends VIN command to bcm
