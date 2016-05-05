@@ -1020,7 +1020,13 @@ def Sp3_change():
 
 
 class App:
+
     def __init__(self, master):
+        # define some variables for button position  - makes organizing easier
+        speaker_y=.44
+        speaker_x=.07
+        volume_y = .36
+
         self.frame = Frame(master, relief=SUNKEN)
         # master.geometry("320x400")
         master.geometry("%sx%s" % (default_sizex, default_sizey))
@@ -1044,7 +1050,7 @@ class App:
         # self.hello_b.bind("<Enter>",jump)
         # self.quit_b.pack(side=BOTTOM)
 
-        self.disconnect_b = Button(master, text="Disconnect", command=disconnect, fg="red", bg="white")
+        self.disconnect_b = Button(master, text="Disconnect", command=disconnect, fg="red", bg="white", height=1, width=10, font=font1)
         self.disconnect_b.pack(side=BOTTOM)
         disconnect_b_ttp = CreateToolTip(self.disconnect_b, "Disconnects BT and stops server - use if changing config")
 
@@ -1104,62 +1110,64 @@ class App:
 
         self.setVol1_b = Button(master, text="Vol=1", command=set_vol1, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol1_b.pack()
-        self.setVol1_b.place(rely=.36, relx=0)
+        self.setVol1_b.place(rely=volume_y, relx=0)
         setVol1_b_ttp = CreateToolTip(self.setVol1_b, "Use + and - to adjust the value of this button.")
 
         self.setVol5_b = Button(master, text="Vol=5", command=set_vol5, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol5_b.pack()
-        self.setVol5_b.place(rely=.36, relx=.14)
+        self.setVol5_b.place(rely=volume_y, relx=.16)
 
         self.setVol16_b = Button(master, text="Vol=16", command=set_vol16, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol16_b.pack()
-        self.setVol16_b.place(rely=.36, relx=.28)
+        self.setVol16_b.place(rely=volume_y, relx=.32)
         setVol16_b_ttp = CreateToolTip(self.setVol16_b, "Use < and > to adjust the value of this button.")
 
-        self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green",height=3, width=6)
+        self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol19_b.pack()
-        self.setVol19_b.place(rely=.36, relx=.44)
+        self.setVol19_b.place(rely=volume_y, relx=.48)
 
-        self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green",height=3, width=6)
+        self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green", height=2, width=6, font=font1)
         self.setVol22_b.pack()
-        self.setVol22_b.place(rely=.36, relx=.6)
+        self.setVol22_b.place(rely=volume_y, relx=.64)
 
-        self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green",height=3, width=6)
+        self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green", height=2, width=7, font=font1)
         self.setVolX_b.pack()
-        self.setVolX_b.place(rely=.36, relx=.76)
+        self.setVolX_b.place(rely=volume_y, relx=.8)
         setVolX_b_ttp = CreateToolTip(self.setVolX_b, "Enter steps in box to right. If blank then 0 is used")
 
-        self.speakerLF_b = Button(master, text="Speaker LF", command=speaker_LF, fg="white", bg="black",height=3, width=8)
+        self.speakerLF_b = Button(master, text="Speaker LF", command=speaker_LF, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerLF_b.pack()
-        self.speakerLF_b.place(rely=.45, relx=.14)
+        self.speakerLF_b.place(rely=speaker_y + .12, relx=speaker_x)
         speakerLF_b_ttp = CreateToolTip(self.speakerLF_b, "Enable LEFT FRONT speaker only")
 
-        self.speakerCenter_b = Button(master, text="Speaker Center", command=speaker_Center, fg="white", bg="black",height=3, width = 6)
+        self.speakerCenter_b = Button(master, text="Speaker Center", command=speaker_Center, fg="white", bg="black", height=2, width=12, font=font1)
         self.speakerCenter_b.pack()
-        self.speakerCenter_b.place(rely=.45, relx=.36)
+        self.speakerCenter_b.place(rely=speaker_y + .12, relx=speaker_x + .24)
+        speakerCenter_b_ttp = CreateToolTip(self.speakerCenter_b, "Enable Center Speaker only")
 
-        self.speakerRF_b = Button(master, text="Speaker RF", command=speaker_RF, fg="white", bg="black",height=3, width = 6)
+        self.speakerRF_b = Button(master, text="Speaker RF", command=speaker_RF, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerRF_b.pack()
-        self.speakerRF_b.place(rely=.45, relx=.66)
+        self.speakerRF_b.place(rely=speaker_y + .12, relx=speaker_x + .52)
         speakerRF_b_ttp = CreateToolTip(self.speakerRF_b, "Enable RIGHT FRONT speaker only")
 
-        self.speakerRR_b = Button(master, text="Speaker RR", command=speaker_RR, fg="white", bg="black",height=3, width = 6)
+        self.speakerRR_b = Button(master, text="Speaker RR", command=speaker_RR, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerRR_b.pack()
-        self.speakerRR_b.place(rely=.57, relx=.66)
+        self.speakerRR_b.place(rely=speaker_y + .28, relx=speaker_x + .52)
         speakerRR_b_ttp = CreateToolTip(self.speakerRR_b, "Enable RIGHT REAR speaker only")
 
-        self.speakerSub_b = Button(master, text="Speaker Sub", command=speaker_Sub, fg="white", bg="black",height=3, width = 6)
+        self.speakerSub_b = Button(master, text="Speaker Sub", command=speaker_Sub, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerSub_b.pack()
-        self.speakerSub_b.place(rely=.57, relx=.39)
+        self.speakerSub_b.place(rely=speaker_y + .28, relx=speaker_x + .255)
+        speakerSub_b_ttp = CreateToolTip(self.speakerSub_b, "Enable Subwoofer only")
 
-        self.speakerLR_b = Button(master, text="Speaker LR", command=speaker_LR, fg="white", bg="black",height=3, width = 6)
+        self.speakerLR_b = Button(master, text="Speaker LR", command=speaker_LR, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerLR_b.pack()
-        self.speakerLR_b.place(rely=.57, relx=.14)
+        self.speakerLR_b.place(rely=speaker_y + .28, relx=speaker_x)
         speakerLR_b_ttp = CreateToolTip(self.speakerLR_b, "Enable LEFT REAR speaker only")
 
-        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black",height=3, width = 6)
+        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerAll_b.pack()
-        self.speakerAll_b.place(rely=.68, relx=.39)
+        self.speakerAll_b.place(rely=speaker_y + .12, relx=speaker_x + .72)
         speakerAll_b_ttp = CreateToolTip(self.speakerAll_b, "Turn all speakers on to original setting")
 
         self.Testerp_b = Button(master, text="TesterP On", command=testerPon, fg="blue", bg="pink")
@@ -1199,7 +1207,7 @@ class CreateToolTip(object):
         # Leaves only the label and removes the app window
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = tk.Label(self.tw, text=self.text, justify='left', background='yellow', relief='solid', borderwidth=1, font=("times", "8", "normal"))
+        label = tk.Label(self.tw, text=self.text, justify='left', background='yellow', relief='solid', borderwidth=1, font=("times", "10", "normal"))
         label.pack(ipadx=1)
 
     def close(self, event=None):
@@ -1216,7 +1224,7 @@ loaded_config.set('Config file not loaded!!')
 e_popup = False
 VIN_ecu = ""
 ocolor = root.cget('bg')
-info_l1 = Label(root, textvariable=loaded_config)
+info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
 
 # Define fonts to use
@@ -1316,7 +1324,7 @@ speaker_menu.add_checkbutton(label="Config 3", onvalue=True, offvalue=False, var
 menubar.add_cascade(label='Speakers', menu=speaker_menu)
 
 
-info_l2 = Label(root, text="Connection Status = NOT CONNECTED")
+info_l2 = Label(root, text="Connection Status = NOT CONNECTED", font="12")
 info_l2.pack(side=TOP)
 
 
