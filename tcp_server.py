@@ -202,7 +202,15 @@ def doCommand(command):
                     print("Volume X=" + str(command[i+1:]))
                     new_data = command[i+1:]
                     command = command[:10]
-        
+
+        if command[:13] == "AMPsetVolumeX":
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 8:
+                    print("AMP Volume X=" + str(command[i+1:]))
+                    new_data = command[i+1:]
+                    command = command[:13]
+
         if command[:8] == "setBassX":
                 i = command.find(",")  # added by LVB
                 logging.info("i = " + str(i))
@@ -210,6 +218,14 @@ def doCommand(command):
                     print("Bass X=" + str(command[i+1:]))
                     new_data = command[i+1:]
                     command = command[:8]
+
+        if command[:11] == "AMPsetBassX":
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 8:
+                    print("AMP Bass X=" + str(command[i+1:]))
+                    new_data = command[i+1:]
+                    command = command[:11]
         
         if command[:8] == "setTrebX":
                 i = command.find(",")  # added by LVB
@@ -218,7 +234,15 @@ def doCommand(command):
                     print("Treb X="+str(command[i+1:]))
                     new_data = command[i+1:]
                     command = command[:8]
-        
+
+        if command[:11] == "AMPsetTrebX":
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 8:
+                    print("AMP Treb X="+str(command[i+1:]))
+                    new_data = command[i+1:]
+                    command = command[:11]
+
         if command[:8] == "setFreqX":
                 i = command.find(",")  # added by LVB
                 logging.info("i = " + str(i))

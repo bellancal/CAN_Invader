@@ -9,15 +9,23 @@ from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE
 import os
 import ConfigFile
 import configparser
+"""
+Purpose: Main file that creates the gui using TK widgets for the CAN INVADER control.
+This program will launch the BT server and initiate message using server.  This program will also monitor for server status
+and CAN responses for the diagnostic requests and present these to user.
 
+Author: Louis V Bellanca / LBELLAN1@FORD.COM
+Date: April 2016 first release
+"""
+# TODO: Add link to show pdf help page on how to use
 
 # Define global variables here
 cfg = configparser.ConfigParser()
 engineering_mode = False
 command_error = False
 # set defaults for the size
-default_sizex = "320"
-default_sizey = "400"
+default_sizex = "662"
+default_sizey = "478"
 fileOK = ""
 MasterVol1 = 1
 MasterVol2 = 16
@@ -26,12 +34,12 @@ MasterVol2 = 16
 def ConfigSelect(selection=None):
     print("Configuration selected = " + str(selection))
     if selection is not None:
-        LoadConfig(ConfigFile.config_list[selection])
+        LoadConfig(ConfigFile.config_list2[selection]["filename"])
 
 
 def LoadConfig(filetoload):
     # sub to check the config file and load data
-    global sizex, sizey, fileOK
+    global sizex, sizey, fileOK, config_file
     # refer to the file to see if a config is defined
     fileOK = cfg.read(filetoload)
 
@@ -39,8 +47,9 @@ def LoadConfig(filetoload):
         print("ini file read in bg = " + str(fileOK))
         loaded_config.set("Config file = " + filetoload)
 
-        ConfigFile.CFT = filetoload
-        print(ConfigFile.CFT)
+        # ConfigFile.CFT = filetoload
+        print("Attempting to load config = " + filetoload)
+        config_file = filetoload
         # CheckTP()
         CheckAMP()
         CheckAHU()
@@ -62,6 +71,8 @@ def LoadConfig(filetoload):
 
         # change the window to the defined size
         root.geometry("%sx%s" % (sizex, sizey))
+
+
 
     else:
         print("Missing Config File!!" + str(fileOK))
@@ -188,35 +199,47 @@ def CheckVIN():
     [VIN]
     ecu = bcm sync, ahu, ipc, bcm, abs - only list 1!!!
     """
-    global VIN_ecu
+    global VIN_ecu, vin_y, vin_x
     if cfg.has_section('VIN'):
         VIN_ecu = cfg['VIN']['ECU'].upper()
         print("VIN ecu = " + VIN_ecu)
-        # sho the ones  used
+        # hide all and show the ones  used
+        HideVINbuttons()
         if VIN_ecu == "SYNC":
             print("Show VIN-SYNC")
             app.getVINsync_b.pack()
-            app.getVINsync_b.place(rely=.28, relx=.40)
+            app.getVINsync_b.place(rely=vin_y, relx=.40)
         elif VIN_ecu == "AHU":
             print("Show VIN-AHU")
             app.getVINahu_b.pack()
-            app.getVINahu_b.place(rely=.28, relx=0)
+            app.getVINahu_b.place(rely=vin_y, relx=vin_x)
         elif VIN_ecu == "ABS":
             print("Show VIN-ABS")
             app.getVINabs_b.pack()
-            app.getVINabs_b.place(rely=.28, relx=.20)
+            app.getVINabs_b.place(rely=vin_y, relx=0)
         elif VIN_ecu == "BCM":
             print("Show VIN-BCM")
             app.getVINbcm_b.pack()
-            app.getVINbcm_b.place(rely=.28, relx=.62)
+            app.getVINbcm_b.place(rely=vin_y, relx=vin_x * 2)
         elif VIN_ecu == "IPC":
             print("Show VIN-IPC")
             app.getVINipc_b.pack()
-            app.getVINipc_b.place(rely=.28, relx=.81)
+            app.getVINipc_b.place(rely=vin_y, relx=vin_x * 3)
+        elif VIN_ecu == "RCM":
+            print("Show VIN-RCM")
+            app.getVINrcm_b.pack()
+            app.getVINrcm_b.place(rely=vin_y, relx=vin_x * 4)
 
     else:
         print("No VIN ecu in config")
 
+def HideVINbuttons():
+    app.getVINahu_b.place_forget()
+    app.getVINabs_b.place_forget()
+    app.getVINsync_b.place_forget()
+    app.getVINbcm_b.place_forget()
+    app.getVINipc_b.place_forget()
+    app.getVINrcm_b.place_forget()
 
 def Hide(action):
     print("hiding =" + str(action))
@@ -233,21 +256,17 @@ def Hide(action):
         app.Test_b.place_forget()
         tpid.place_forget()
         tpid_off.place_forget()
+        HideVINbuttons()
 
-        app.getVINahu_b.place_forget()
-        app.getVINabs_b.place_forget()
-        app.getVINsync_b.place_forget()
-        app.getVINbcm_b.place_forget()
-        app.getVINipc_b.place_forget()
 
     else:
         app.onepress_b.place_forget()
         app.startserver_b.pack(in_=app.frame)
-        app.startserver_b.place(rely=.12, relx=0)
+        app.startserver_b.place(rely=.12, relx=.2)
         app.onepress_b.pack(in_=app.frame)
-        app.onepress_b.place(rely=.05, relx=0)
+        app.onepress_b.place(rely=.12, relx=0)
         app.connect_b.pack(in_=app.frame)
-        app.connect_b.place(rely=.12, relx=.2)
+        app.connect_b.place(rely=.12, relx=.3)
         # app.setBass_b.pack(in_=app.frame)
         # app.setBass_b.place(rely=.2, relx=0)
         # app.setTreb_b.pack(in_=app.frame)
@@ -259,36 +278,38 @@ def Hide(action):
         app.radioOn_b.pack(in_=app.frame)
         app.radioOn_b.place(rely=.12, relx=.4)
         app.Testerp_b.pack(in_=app.frame)
-        app.Testerp_b.place(rely=.68, relx=.80)
+        app.Testerp_b.place(rely=.75, relx=.86)
         app.TesterpOff_b.pack(in_=app.frame)
-        app.TesterpOff_b.place(rely=.84, relx=.80)
+        app.TesterpOff_b.place(rely=.84, relx=.86)
         app.Test_b.pack(in_=app.frame)
         app.Test_b.place(rely=.9, relx=0)
         tpid.pack(in_=app.frame)
         tpid.place(rely=.76, relx=.82)
         tpid_off.pack(in_=app.frame)
-        tpid_off.place(rely=.92, relx=.82)
+        tpid_off.place(rely=.85, relx=.82)
 
         app.getVINahu_b.pack()
-        app.getVINahu_b.place(rely=.28, relx=0)
+        app.getVINahu_b.place(rely=vin_y, relx=vin_x)
         app.getVINabs_b.pack()
-        app.getVINabs_b.place(rely=.28, relx=.20)
+        app.getVINabs_b.place(rely=vin_y, relx=0)
         app.getVINsync_b.pack()
-        app.getVINsync_b.place(rely=.28, relx=.40)
+        app.getVINsync_b.place(rely=vin_y, relx=vin_x * 5)
         app.getVINbcm_b.pack()
-        app.getVINbcm_b.place(rely=.28, relx=.62)
+        app.getVINbcm_b.place(rely=vin_y, relx=vin_x * 2)
         app.getVINipc_b.pack()
-        app.getVINipc_b.place(rely=.28, relx=.81)
+        app.getVINipc_b.place(rely=vin_y, relx=vin_x * 3)
+        app.getVINrcm_b.pack()
+        app.getVINrcm_b.place(rely=vin_y, relx=vin_x * 4)
 
 
 def quitme():
     # write the window size to the ini file for next startup
-    global fileOK, servercmd
+    global fileOK, servercmd, config_file
     if fileOK:
         cfg.set('SIZE', 'X', str(root.winfo_width()))
         cfg.set('SIZE', 'Y', str(root.winfo_height()))
         print("Saving Configuration data...")
-        cfg.write(open(ConfigFile.config_file, "w"))
+        cfg.write(open(config_file, "w"))
     disconnect()
     try:
         servercmd.kill()
@@ -360,7 +381,7 @@ def start_server():
 
     print("starting server")
     global servercmd
-    servercmd = subprocess.Popen([sys.executable, "tcp_server.py", "--CONFIG", ConfigFile.CFT], creationflags=CREATE_NEW_CONSOLE)
+    servercmd = subprocess.Popen([sys.executable, "tcp_server.py", "--CONFIG", config_file], creationflags=CREATE_NEW_CONSOLE)
 
 
 def onepress():
@@ -477,8 +498,14 @@ def set_bass():
         b = '0E'  # max
     else:
         b = format(int(b) + 7,'02X')
-    print("Set Bass=" + b)
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassX,' + b], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    if Amp_Present.get():
+        print("AMP Set BASS =" + b)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Bass=" + b)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassX,' + b], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -499,8 +526,15 @@ def set_treble():
         t = '07'  # nominal
     else:
         t = format(int(t) + 7,'02X')
-    print("Set Treble=" + t)
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebX,' + t], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+
+    if Amp_Present.get():
+        print("AMP Set Treble =" + t)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Treble=" + t)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebX,' + t], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -536,10 +570,16 @@ def set_vol1():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol " + str(MasterVol1))
+
     v = format(MasterVol1, '02x')
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    # os.system("start /wait cmd /c setVolumeX1.bat")
+
+    if Amp_Present.get():
+        print("AMP Set Vol " + str(MasterVol1))
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Vol " + str(MasterVol1))
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -553,8 +593,13 @@ def set_vol5():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol 5")
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,05'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    if Amp_Present.get():
+        print("AMP Set Vol 5")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Vol 5")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,05'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # os.system("start /wait cmd /c setVolumeX5.bat")
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -573,9 +618,15 @@ def set_vol19():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol 13")
-    # os.system("start /wait cmd /c setVolumeX13.bat")
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    if Amp_Present.get():
+        print("AMP Set Vol 13")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Vol 13")
+        # os.system("start /wait cmd /c setVolumeX13.bat")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -588,11 +639,18 @@ def set_vol16():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol " + str(MasterVol2))
     v = format(MasterVol2, '02x')
-    # print("Set Vol 16")
-    # os.system("start /wait cmd /c setVolumeX13.bat")
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    if Amp_Present.get():
+        print("AMP Set Vol 5" + str(MasterVol2))
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Vol " + str(MasterVol2))
+        v = format(MasterVol2, '02x')
+        # print("Set Vol 16")
+        # os.system("start /wait cmd /c setVolumeX13.bat")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -605,9 +663,15 @@ def set_vol22():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol 13")
-    # os.system("start /wait cmd /c setVolumeX13.bat")
-    p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    if Amp_Present.get():
+        print("AMP Set Vol 16")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    else:
+        print("Set Vol 16")
+        # os.system("start /wait cmd /c setVolumeX13.bat")
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -624,14 +688,25 @@ def set_volX():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    print("Set Vol X")
+
     v = vin.get()
-    print("X = "+ v)
     if v != "":
-        v= format(int(v), '02x')
-        p=Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,'+ v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        v = format(int(v), '02x')
+        if Amp_Present.get():
+            print("AMP Set Vol X =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("Set Vol X =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     else:  # no data entered so assume default defined in setVolumeX command that is 0
-        p=Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        if Amp_Present.get():
+            print("AMP Set Vol X =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("Set Vol X =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    # check responses
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -780,13 +855,18 @@ def speaker_LF():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    # take into account the speaker config, AHU type, and AMP presence todo
+    # take into account the speaker config, AHU type, and AMP presence
     print("Speaker LF")
-    if AHU_Clar.get():
-            if Speaker1.get():
+
+    # Check for AMP first
+    if  Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+    elif AHU_Clar.get():
+            if Speaker1.get(): # no tweeters
                 print("AHU=Clar, Speaker=1")
                 p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-            else:
+            else: # with tweeters
                 p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get():
             print("Panasonic")
@@ -1022,10 +1102,8 @@ def Sp3_change():
 class App:
 
     def __init__(self, master):
-        # define some variables for button position  - makes organizing easier
-        speaker_y=.44
-        speaker_x=.07
-        volume_y = .36
+        # reference global variables for button position  - makes organizing easier
+        global speaker_y, speaker_x, volume_y, vin_y
 
         self.frame = Frame(master, relief=SUNKEN)
         # master.geometry("320x400")
@@ -1061,7 +1139,7 @@ class App:
 
         self.connect_b = Button(master, text="Connect", command=connect, fg="blue", bg="white")
         self.connect_b.pack()
-        self.connect_b.place(rely=.12, relx=.2)
+        self.connect_b.place(rely=.12, relx=.3)
         Connect_b_ttp = CreateToolTip(self.connect_b, "Connects BT, initializes CAN and starts default TP message.")
 
         self.radioOn_b = Button(master, text="Radio On", command=radio_on, fg="white", bg="purple")
@@ -1070,7 +1148,7 @@ class App:
 
         self.setBass_b = Button(master, text="Set Bass", command=set_bass, fg="blue", bg="yellow")
         self.setBass_b.pack()
-        self.setBass_b.place(rely=.2, relx=0)
+        self.setBass_b.place(rely=.2, relx=.2)
         setBass_b_ttp = CreateToolTip(self.setBass_b, "Set Bass. Enter value on right or leave blank for default.")
 
         self.setTreb_b = Button(master, text="Set Treb", command=set_treble, fg="blue", bg="yellow")
@@ -1078,33 +1156,39 @@ class App:
         self.setTreb_b.place(rely=.2, relx=.34)
         setTreb_b_ttp = CreateToolTip(self.setTreb_b, "Set Treble. Enter value on right or leave blank for default.")
 
-        self.getVINahu_b = Button(master, text="VIN AHU", command=get_VIN_AHU, fg="white", bg="brown")
+        self.getVINahu_b = Button(master, text="VIN AHU", command=get_VIN_AHU, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINahu_b.pack()
-        self.getVINahu_b.place(rely=.28, relx=0)
+        self.getVINahu_b.place(rely=vin_y, relx=vin_x)
+        getVINahu_b_ttp = CreateToolTip(self.getVINahu_b, "Read VIN from AHU in F190.")
 
-        self.getVINabs_b = Button(master, text="VIN ABS", command=get_VIN_ABS, fg="white", bg="brown")
+        self.getVINabs_b = Button(master, text="VIN ABS", command=get_VIN_ABS, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINabs_b.pack()
-        self.getVINabs_b.place(rely=.28, relx=.20)
+        self.getVINabs_b.place(rely=vin_y, relx=0)
+        getVINabs_b_ttp = CreateToolTip(self.getVINabs_b, "Read VIN from ABS module in F190.")
 
-        self.getVINsync_b = Button(master, text="VIN SYNC", command=get_VIN_SYNC, fg="white", bg="brown")
+        self.getVINsync_b = Button(master, text="VIN SYNC", command=get_VIN_SYNC, fg="white", bg="brown", height=2, width=8, font=font1)
         self.getVINsync_b.pack()
-        self.getVINsync_b.place(rely=.28, relx=.40)
+        self.getVINsync_b.place(rely=vin_y, relx=vin_x * 5)
+        getVINsync_b_ttp = CreateToolTip(self.getVINsync_b, "Read VIN from SYNC in F190.")
 
-        self.getVINbcm_b = Button(master, text="VIN BCM", command=get_VIN_BCM, fg="white", bg="brown")
+        self.getVINbcm_b = Button(master, text="VIN BCM", command=get_VIN_BCM, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINbcm_b.pack()
-        self.getVINbcm_b.place(rely=.28, relx=.62)
+        self.getVINbcm_b.place(rely=vin_y, relx=vin_x * 2)
+        getVINbcm_b_ttp = CreateToolTip(self.getVINbcm_b, "Read VIN from BCM in F190.")
 
-        self.getVINipc_b = Button(master, text="VIN IPC", command=get_VIN_IPC, fg="white", bg="brown")
+        self.getVINipc_b = Button(master, text="VIN IPC", command=get_VIN_IPC, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINipc_b.pack()
-        self.getVINipc_b.place(rely=.28, relx=.81)
+        self.getVINipc_b.place(rely=vin_y, relx=vin_x * 3)
+        getVINipc_b_ttp = CreateToolTip(self.getVINipc_b, "Read VIN from IPC in F190.")
 
-        self.getVINrcm_b = Button(master, text="VIN RCM", command=get_VIN_RCM, fg="white", bg="brown")
+        self.getVINrcm_b = Button(master, text="VIN RCM", command=get_VIN_RCM, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINrcm_b.pack()
-        self.getVINrcm_b.place(rely=.33, relx=.62)
+        self.getVINrcm_b.place(rely=vin_y, relx=vin_x * 4)
+        getVINrcm_b_ttp = CreateToolTip(self.getVINrcm_b, "Read VIN from RCM in F190.")
 
-        self.setFreq_b = Button(master, text="Set Freq", command=set_freq, fg="blue", bg="orange")
+        self.setFreq_b = Button(master, text="Set Freq", command=set_freq, fg="blue", bg="orange",  height=2, width=7, font=font1)
         self.setFreq_b.pack()
-        self.setFreq_b.place(rely=.12, relx=.63)
+        self.setFreq_b.place(rely=.12, relx=.64)
         # creat tool tips here
         setFreq_b_ttp = CreateToolTip(self.setFreq_b, "Use box to enter optional frequency. If blank default used.")
 
@@ -1172,13 +1256,13 @@ class App:
 
         self.Testerp_b = Button(master, text="TesterP On", command=testerPon, fg="blue", bg="pink")
         self.Testerp_b.pack()
-        self.Testerp_b.place(rely=.68, relx=.80)
+        self.Testerp_b.place(rely=.71, relx=.85)
 
         self.TesterpOff_b = Button(master, text="TesterP Off", command=testerPoff, fg="blue", bg="pink")
         self.TesterpOff_b.pack()
         self.TesterpOff_b.place(rely=.84, relx=.80)
 
-        self.onepress_b = Button(master, text="Start Here!", command=onepress, fg="white", bg="blue")
+        self.onepress_b = Button(master, text="Start Here!", command=onepress, fg="white", bg="blue", height=2, width=10, font=font1)
         self.onepress_b.pack()
         self.onepress_b.place(rely=.12, relx=0)
         onepress_b_ttp = CreateToolTip(self.onepress_b, "Starts server, configures CAN, TP on, radio on, sets treb bass vol and freq to default")
@@ -1226,6 +1310,12 @@ VIN_ecu = ""
 ocolor = root.cget('bg')
 info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
+# global positioning variables to make life easier
+speaker_y = .47
+speaker_x = .07
+volume_y = .42
+vin_y = .27
+vin_x = .16
 
 # Define fonts to use
 font1 = font.Font(family='Helvetica', size='14')
@@ -1243,22 +1333,22 @@ fin_ttp = CreateToolTip(fin, "Enter as freq x 10: 897 for 89.7")
 
 vin = Entry(root, bd=2, width=2)
 vin.pack()
-vin.place(rely=.37, relx=.94)
+vin.place(rely= speaker_y, relx=.94)
 vin_ttp = CreateToolTip(vin, "Enter volume steps 0 to 30")
 
 tpid_off = Entry(root, bd=2, width=3)
 tpid_off.pack()
 tpid_off.place(rely=.92, relx=.82)
-tpid_off_ttp = CreateToolTip(tpid_off, "Enter optional ECU ID for tester present off message. ex: 7DF")
+tpid_off_ttp = CreateToolTip(tpid_off, "Enter ECU ID to disable tester present message. ex: 7DF")
 
 bass_in = Entry(root, bd=2, width=2)
 bass_in.pack()
-bass_in.place(rely=.21, relx=.18)
+bass_in.place(rely=.21, relx=.285)
 bass_in_ttp = CreateToolTip(bass_in, "Enter bass -7 to 7. Defaults to 7(max)")
 
 treb_in = Entry(root, bd=2, width=2)
 treb_in.pack()
-treb_in.place(rely=.21, relx=.52)
+treb_in.place(rely=.21, relx=.427)
 treb_in_ttp = CreateToolTip(treb_in, "Enter treble -7 to 7. Defaults to 0(nom)")
 
 
@@ -1371,9 +1461,15 @@ Help_menu.add_separator()
 
 submenu = Menu(Help_menu)
 # automatically scroll thru the list and add to the menu
-for i in range(len(ConfigFile.config_list)):
+#for i in range(len(ConfigFile.config_list)):
     # submenu.add_command(label=ConfigFile.config_list[i], command=lambda : ConfigSelect(selection=i))
-    submenu.add_command(label=ConfigFile.config_list[i], command=lambda s=i: ConfigSelect(selection=s))
+ #   submenu.add_command(label=ConfigFile.config_list[i], command=lambda s=i: ConfigSelect(selection=s))
+
+# automatically scroll thru the list and add to the menu the displayname
+for i in range(len(ConfigFile.config_list2)):
+    # submenu.add_command(label=ConfigFile.config_list[i], command=lambda : ConfigSelect(selection=i))
+    submenu.add_command(label=ConfigFile.config_list2[i]["displayname"], command=lambda s=i: ConfigSelect(selection=s))
+
 
 Help_menu.add_cascade(label='Configuration', menu=submenu, underline=0)
 menubar.add_cascade(label='Help', menu=Help_menu)
@@ -1391,6 +1487,7 @@ Hide(True)
 
 
 # Load the configuration file if present - needs to be done after to App(root) and Hide(True) to allow hiding/showing for the buttons
-LoadConfig(ConfigFile.config_file)
+LoadConfig(ConfigFile.config_file_default)
+config_file = ConfigFile.config_file_default
 
 root.mainloop()

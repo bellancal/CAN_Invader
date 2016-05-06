@@ -43,7 +43,7 @@ def cancodes_init(config_file):
     print("CAN Channel = " + cfg['CAN']['busType'])
     print("CAN Speed = " + cfg['CAN']['speed'])
 
-    # set freq to value in ini file.
+    # set freq to value in ini file. note that some system must have FM audio active for this to work like GEN2 SYNC
     set_freq = {"reqID": '727',
                 "cmd": '2f',
                 "DID": '61a1',
@@ -68,7 +68,7 @@ def cancodes_init(config_file):
                    "access": '03',
                    "data": volume_steps[int(cfg['DUT']['VOLUME_REAR'])]}
 
-    # ============================================================================================================
+# FREQUENCY CONTROL ==============================================================================================
     # set freq to user defined value.  See 31.1.3.1    MMDIAG-IF00004-FM&TMC Tuner Test Mode_Common GGDS Interface
     set_freq_x = {"reqID": '727',
                   "cmd": '2f',
@@ -76,8 +76,8 @@ def cancodes_init(config_file):
                   "parameter": '03',
                   "access": '03',
                   "data": ''}  # defined later
-
-
+# ============================================================================================================
+# VOLUME CONTROL ==============================================================================================
 
     # Sets the volume to value passed at function call
     set_volume_x = {"reqID": '727',
@@ -87,45 +87,76 @@ def cancodes_init(config_file):
                     "access": '03',
                     "data": '00'}  # define default as 0
 
+    # Sets the volume to value passed at function call
+    AMP_set_volume_x = {"reqID": '783',
+                        "cmd": '2f',
+                        "DID": '833b',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": '00'}  # define default as 0
 
+# ============================================================================================================
+# BASS & TREBLE CONTROL ==============================================================================================
 
+    # Sets the treble for Visteon TODO: Check these values are correct for visteon AHU not currently being used
+    # For Panasonic set other DID fda2
+    # AHU spec Part2_Visteon_DS-F1BT-18C815-AB004-C1MCA.docx  says FDA2 - DAB Preset Data fda3 not used
 
-    # Sets the treble for Visteon
-    # For Panasonic set DID fda2 AHU
     set_treb_visteon = {"reqID": '727',
-                "cmd": '2e',
-                "DID": 'fd2c',
-                "parameter": '03',
-                "access": '03',
-                "data": '00'}
+                        "cmd": '2e',
+                        "DID": 'fd2c',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": '00'}
 
 
     # Sets the bass to maximum for Visteon
-    # For Panasonic set DID fda3 AHU
+    # For Panasonic use other DID fda3 AHU
     set_bass_visteon = {"reqID": '727',
-                "cmd": '2e',
-                "DID": 'fd2b',
-                "parameter": '03',
-                "access": '03',
-                "data": '07'}
+                        "cmd": '2e',
+                        "DID": 'fd2b',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": '07'}
 
     # Sets the bass to value passed at function call
     # For Panasonic set DID fda3 AHU not fd2b
+    # seems to work on clarion as well as the NA Visteon AHU and Panasonic of course
     set_bass_x_pana = {"reqID": '727',
-                  "cmd": '2f',
-                  "DID": 'fda3',
-                  "parameter": '03',
-                  "access": '03',
-                  "data": ''}  # defined later
+                       "cmd": '2f',
+                       "DID": 'fda3',
+                       "parameter": '03',
+                       "access": '03',
+                       "data": ''}  # defined later
 
     # Sets the treble to value passed at function call
     # For Panasonic set DID fda2 AHU
+    # seems to work on clarion as well as the NA Visteon AHU and Panasonic of course
     set_treb_x_pana = {"reqID": '727',
-                  "cmd": '2f',
-                  "DID": 'fda2',
-                  "parameter": '03',
-                  "access": '03',
-                  "data": ''}  # defined later
+                       "cmd": '2f',
+                       "DID": 'fda2',
+                       "parameter": '03',
+                       "access": '03',
+                       "data": ''}  # defined later
+
+    # Sets the bass to value passed at function call for AMP
+    AMP_set_bass_x = {"reqID": '783',
+                      "cmd": '2f',
+                      "DID": 'fda3',
+                      "parameter": '03',
+                      "access": '03',
+                      "data": ''}  # defined later
+
+    # Sets the treble to value passed at function call for AMP 
+    AMP_set_treb_x = {"reqID": '783',
+                      "cmd": '2f',
+                      "DID": 'fda2',
+                      "parameter": '03',
+                      "access": '03',
+                      "data": ''}  # defined later
+
+# ============================================================================================================
+# SPEAKER CONTROL ==============================================================================================
 
     # Enables only the left front speaker
     # see "Global AHU SPSS ver2.3 4-21-2010.doc"  section 31.6.2.1    MMDIAG-IF00007-Speaker
@@ -154,12 +185,29 @@ def cancodes_init(config_file):
                      "data": 'fdfdffffffffffff'}
 
     # Enables left front speaker and left tweeter  4 bytes for Clarion
+    AMP_set_lf_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fdfdffff'}
+
+
+    # Enables left front speaker and left tweeter  4 bytes for Clarion
     set_lf_on_twt_4 = {"reqID": '727',
                        "cmd": '2f',
                        "DID": '8003',
                        "parameter": '03',
                        "access": '03',
                        "data": 'fdfdffff'}
+
+    # Enables all speakers  4 bytes for Clarion
+    AMP_set_all_on_4 = {"reqID": '783',
+                        "cmd": '2f',
+                        "DID": '8003',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": '30fcffff'}
 
     # Enables all speakers  4 bytes for Clarion
     set_all_on_4 = {"reqID": '727',
@@ -185,6 +233,7 @@ def cancodes_init(config_file):
                  "access": '03',
                  "data": 'fe ff ff ff ff ff ff ff'}
 
+
     # Enables only the right front speaker 4 bytes for Clarion
     set_rf_on_4 = {"reqID": '727',
                    "cmd": '2f',
@@ -209,6 +258,14 @@ def cancodes_init(config_file):
                        "access": '03',
                        "data": 'fefeffff'}
 
+    # Enables only the right front speaker 4 bytes for AMP
+    AMP_set_rf_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fefeffff'}
+
     # Enables only the right rear speaker
     set_rr_on = {"reqID": '727',
                  "cmd": '2f',
@@ -225,6 +282,14 @@ def cancodes_init(config_file):
                    "access": '03',
                    "data": 'fbffffff'}
 
+    # Enables only the right rear speaker 4 bytes for AMP with tweeter
+    AMP_set_rr_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fbfbffff'}
+
     # Enables only the left rear speaker
     set_lr_on = {"reqID": '727',
                  "cmd": '2f',
@@ -233,6 +298,15 @@ def cancodes_init(config_file):
                  "access": '03',
                  "data": 'f7 ff ff ff ff ff ff ff'}
 
+    # Enables only the left rear speaker 4 bytes for AMP with tweeter
+    AMP_set_lr_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'f7f7ffff'}
+
+
     # Enables only the left rear speaker    4 bytes for Clarion
     set_lr_on_4 = {"reqID": '727',
                    "cmd": '2f',
@@ -240,6 +314,7 @@ def cancodes_init(config_file):
                    "parameter": '03',
                    "access": '03',
                    "data": 'f7ffffff'}
+
     # Enables only the center speaker tweeter
     set_cntr_on_twt = {"reqID": '727',
                        "cmd": '2f',
@@ -287,8 +362,26 @@ def cancodes_init(config_file):
                           "access": '03',
                           "data": '7fffffff'}
 
-    # reads VIN stored in AHU
+    # Enables only the subwoofer with AMP   4 bytes for Clarion
+    AMP_set_subwoofer_on_4 = {"reqID": '783',
+                              "cmd": '2f',
+                              "DID": '8003',
+                              "parameter": '03',
+                              "access": '03',
+                              "data": '7fffffff'}
+# ============================================================================================================
+# VIN READING ==============================================================================================
+
+    # reads VIN stored in RCM
     read_vin_rcm = {"reqID": '737',
+                    "cmd": '22',
+                    "DID": 'f190',
+                    "parameter": '',
+                    "access": '',
+                    "data": ''}  # defined later
+
+    # reads VIN stored in PCM
+    read_vin_pcm = {"reqID": '7E0',
                     "cmd": '22',
                     "DID": 'f190',
                     "parameter": '',
@@ -344,6 +437,9 @@ def cancodes_init(config_file):
                 "access": '03',
                 "data": '10000000ffffffff'}
 
+# ============================================================================================================
+# MODE CONTROL ==============================================================================================
+
     # sends radio on command to AHU
     radio_on_ahu = {"reqID": '727',
                     "cmd": '2f',
@@ -360,14 +456,19 @@ def cancodes_init(config_file):
                     "access": '03',
                     "data": '01'}
 
+# ============================================================================================================
+# MASTER DICTIONARY DEFINE ==============================================================================================
+
     canFunctionSets = {"setFreq": set_freq,
                        "setFreqX": set_freq_x,  # x in freq x 10 ex 983 = 98.3
                        "setVolumeFront": set_volume_front,
                        "setVolumeRear": set_volume_rear,
-                       "setBass": set_bass_visteon,
-                       "setTreb": set_treb_visteon,
+                       "setBassVisteon": set_bass_visteon,
+                       "setTrebVisteon": set_treb_visteon,
                        "setBassX": set_bass_x_pana,  # x in hex
                        "setTrebX": set_treb_x_pana,  # x in hex
+                       "AMPsetBassX": AMP_set_bass_x,  # x in hex
+                       "AMPsetTrebX": AMP_set_treb_x,  # x in hex
                        "readVIN": read_vin_ahu,
                        "readVINrcm": read_vin_rcm,
                        "readVINsync": read_vin_sync,  # sends VIN command to SYNC
@@ -378,6 +479,7 @@ def cancodes_init(config_file):
                        "speakerEnableRFtwt": set_rf_on_twt,
                        "speakerEnableLF": set_lf_on,
                        "speakerEnableLFtwt": set_lf_on_twt,
+                       "AMPspeakerEnableLFtwt": AMP_set_lf_on_twt_4,
                        "speakerEnableRR": set_rr_on,
                        "speakerEnableLR": set_lr_on,
                        "speakerEnableCntr": set_cntr_on,
@@ -385,16 +487,22 @@ def cancodes_init(config_file):
                        "speakerEnableSub": set_subwoofer_on,
                        "speakerEnableRF4": set_rf_on_4,  # for clarion
                        "speakerEnableRFtwt4": set_rf_on_twt_4,
+                       "AMPspeakerEnableRFtwt4": AMP_set_rf_on_twt_4,
                        "speakerEnableLF4": set_lf_on_4,
                        "speakerEnableLFtwt4": set_lf_on_twt_4,
                        "speakerEnableRR4": set_rr_on_4,
+                       "AMPspeakerEnableRRtwt4": AMP_set_rr_on_twt_4,
                        "speakerEnableLR4": set_lr_on_4,
+                       "AMPspeakerEnableLRtwt4": AMP_set_lr_on_twt_4,
                        "speakerEnableCntr4": set_cntr_on_4,
                        "speakerEnableCntrtwt4": set_cntr_on_twt_4,
                        "speakerEnableSub4": set_subwoofer_on_4,
+                       "AMPspeakerEnableSub4": AMP_set_subwoofer_on_4,
                        "speakerEnableAllOn4": set_all_on_4,
+                       "AMPspeakerEnableAllOn4": AMP_set_all_on_4,
                        "speakerEnableAllOn": set_all_on,
                        "radioOn": radio_on,  # sends command to MFD
                        "radioOnSYNC": radio_on_sync,  # sends command to MFD
                        "radioOnahu": radio_on_ahu,  # GEN3 SYNC?
+                       "AMPsetVolumeX": AMP_set_volume_x,  # x in hex 00 to 1D
                        "setVolumeX": set_volume_x}  # x in hex 00 to 1D
