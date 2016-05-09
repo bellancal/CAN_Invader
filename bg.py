@@ -17,7 +17,6 @@ and CAN responses for the diagnostic requests and present these to user.
 Author: Louis V Bellanca / LBELLAN1@FORD.COM
 Date: April 2016 first release
 """
-# TODO: Add link to show pdf help page on how to use
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -373,6 +372,11 @@ def about():
     print("width =" + str(root.winfo_width()))
     print("height =" + str(root.winfo_height()))
     # print (root.winfo_geometry())
+
+
+def show_instructions():
+    # show pdf instruction guide
+    subprocess.Popen("instructions.pdf",shell=True)
 
 
 def start_server():
@@ -793,7 +797,22 @@ def get_VIN_BCM():
     command_error = False
     print("Get VIN bcm")
     p = Popen([sys.executable, "pynetcat.py",'localhost','50000','readVINbcm'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    # os.system("start /wait cmd /c log_VIN_SYNC.bat")
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
+
+# TODO-test PCM get VIN and add button
+def get_VIN_PCM():
+    if not User_Connect:
+        tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
+        return
+    global command_error
+    command_error = False
+    print("Get VIN pcm")
+    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','readVINpcm'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -817,6 +836,7 @@ def get_VIN_RCM():
         command_error = True
     else:
         command_error = False
+
 
 def get_VIN_IPC():
     if not User_Connect:
@@ -1457,6 +1477,8 @@ root.after(1000, task)
 # add about item to menu bar
 Help_menu = tk.Menu(menubar, background='white')
 Help_menu.add_command(label="About", command=about)
+Help_menu.add_command(label="Instructions", command=show_instructions)
+
 Help_menu.add_separator()
 
 submenu = Menu(Help_menu)

@@ -474,6 +474,7 @@ def cancodes_init(config_file):
                        "readVINsync": read_vin_sync,  # sends VIN command to SYNC
                        "readVINabs": read_vin_abs,  # sends VIN command to abs
                        "readVINbcm": read_vin_bcm,  # sends VIN command to bcm
+                       "readVINpcm": read_vin_pcm,  # sends VIN command to pcm
                        "readVINipc": read_vin_ipc,  # sends VIN command to cluster
                        "speakerEnableRF": set_rf_on,
                        "speakerEnableRFtwt": set_rf_on_twt,
