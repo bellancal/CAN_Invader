@@ -1,6 +1,0 @@
-
-C:\python35\python.exe "C:\KTest\Klippel_Niehl_Final\OOBD_scripts\pynetcat.py" localhost 50000 connect
-
-C:\python35\python.exe "C:\KTest\Klippel_Niehl_Final\OOBD_scripts\pynetcat.py" localhost 50000 configureCAN
-
-C:\python35\python.exe "C:\KTest\Klippel_Niehl_Final\OOBD_scripts\pynetcat.py" localhost 50000 testerPresentOn
