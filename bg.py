@@ -16,7 +16,15 @@ and CAN responses for the diagnostic requests and present these to user.
 
 Author: Louis V Bellanca / LBELLAN1@FORD.COM
 Date: April 2016 first release
+
+
 """
+
+#TODO:auto  detect presence of amp - need to account different for volume default
+#TODO:determine supplier of AHU from CAN bus.
+#TODO: get input from buld sheet to decode configuration
+
+
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -127,24 +135,49 @@ def CheckSpeaker():
 
 def CheckAMP():
     """
-    checks for AMP in the ini file and sets program accordingly
+    checks for AMP in the ini file and sets program accordingly - also determines the default volume setting
     Enter in config file as:
     [AMP]
     present = 1 | 0
     """
+    global default_volume
     if cfg.has_section('AMP'):
         amptype = cfg['AMP']['PRESENT']
         amptype = amptype.lower()
         if amptype == '1':
             Amp_Present.set(True)
             print("AMP is present")
+            default_volume =  cfg['AMP']['VOLUME']
+
         elif amptype == '0':
             Amp_Present.set(False)
             print("No AMP present")
+            default_volume =  cfg['DUT']['VOLUME_FRONT']
         else:
             print("Invalid AMP type defined - check config")
+
+
     else:
         print("No AMP type found")
+        default_volume =  cfg['DUT']['VOLUME_FRONT']
+
+    loaded_volume.set('Default Volume Setting = ' + default_volume)
+
+
+def AMP_autocheck():
+    global default_volume
+    print("Auto check for AMP")
+    # do auto check for AMP
+    Amp_Present.set(True) # sorce to send messsage to AMP
+    if set_vol_default(0):
+        print("AMP FOUND in AutoCHECK!!")
+        default_volume =  cfg['AMP']['VOLUME']
+    else:
+        print("NO AMP FOUND in AutoCHECK!!")
+        Amp_Present.set(False)
+        default_volume =  cfg['DUT']['VOLUME_FRONT']
+
+    loaded_volume.set('Default Volume Setting = ' + default_volume)
 
 
 def CheckAHU():
@@ -389,17 +422,19 @@ def start_server():
 
 
 def onepress():
-    global command_error
+    global command_error, default_volume
+    print("onepress started")
     command_error = False
     start_server()
     # if connect not successful then do not perform other commands!
     a = connect()
     if a:
+        AMP_autocheck() # another check to make sure of AMP presence
         radio_on()
         set_bass()
         set_treble()
         set_freq()
-        set_vol_default(cfg['DUT']['VOLUME_FRONT'])
+        set_vol_default(default_volume)
 
 
 def testerPon(forceid=None):
@@ -662,6 +697,7 @@ def set_vol16():
     else:
         command_error = False
 
+
 def set_vol22():
     if not User_Connect:
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
@@ -680,8 +716,10 @@ def set_vol22():
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
         command_error = True
+        return False
     else:
         command_error = False
+        return True
 
 
 def set_volX():
@@ -693,7 +731,7 @@ def set_volX():
         return
     global command_error
 
-    v = vin.get()
+    v = v_scale.get()
     if v != "":
         v = format(int(v), '02x')
         if Amp_Present.get():
@@ -721,20 +759,31 @@ def set_volX():
 
 def set_vol_default(v):
     global command_error
-    print("Set Vol default")
+
     # convert to hex for command as ini file is NOT in hex format!!
     v = format(int(v), '02x')
     if v != "":
-        p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        if Amp_Present.get():
+            print("AMP Set Vol Default =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("Set Vol Default =" + v)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
         stdout, stderr = p.communicate()
         if stdout.find(b'Error') > 0:
             print("Error sending last command!")
             command_error = True
+            return False
         else:
             command_error = False
+            return True
+
+
     else:
         print("Default volume missing")
         command_error = True
+        return False
 
 
 
@@ -1237,7 +1286,7 @@ class App:
         self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green", height=2, width=7, font=font1)
         self.setVolX_b.pack()
         self.setVolX_b.place(rely=volume_y, relx=.8)
-        setVolX_b_ttp = CreateToolTip(self.setVolX_b, "Enter steps in box to right. If blank then 0 is used")
+        setVolX_b_ttp = CreateToolTip(self.setVolX_b, "Use slider on right to select desired value")
 
         self.speakerLF_b = Button(master, text="Speaker LF", command=speaker_LF, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerLF_b.pack()
@@ -1330,12 +1379,21 @@ VIN_ecu = ""
 ocolor = root.cget('bg')
 info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
+info_l1.place(relx=0)
+default_volume = 0
 # global positioning variables to make life easier
 speaker_y = .47
 speaker_x = .07
 volume_y = .42
 vin_y = .27
 vin_x = .16
+
+# volume label
+loaded_volume = StringVar()
+loaded_volume.set('Volume Setting = tbd')
+info_l3 = Label(root, textvariable=loaded_volume, font="12")
+info_l3.pack(side=TOP)
+info_l3.place(relx=.65)
 
 # Define fonts to use
 font1 = font.Font(family='Helvetica', size='14')
@@ -1351,10 +1409,14 @@ fin.place(rely=.13, relx=.8)
 fin_ttp = CreateToolTip(fin, "Enter as freq x 10: 897 for 89.7")
 
 
-vin = Entry(root, bd=2, width=2)
-vin.pack()
-vin.place(rely= speaker_y, relx=.94)
-vin_ttp = CreateToolTip(vin, "Enter volume steps 0 to 30")
+#vin = Entry(root, bd=2, width=2)
+#vin.pack()
+#vin.place(rely= speaker_y, relx=.94)
+#vin_ttp = CreateToolTip(vin, "Enter volume steps 0 to 30")
+
+v_scale = Scale(root, from_=0, to=30)
+v_scale.pack()
+v_scale.place(rely=speaker_y-.12, relx=.935)
 
 tpid_off = Entry(root, bd=2, width=3)
 tpid_off.pack()
@@ -1436,6 +1498,9 @@ menubar.add_cascade(label='Speakers', menu=speaker_menu)
 
 info_l2 = Label(root, text="Connection Status = NOT CONNECTED", font="12")
 info_l2.pack(side=TOP)
+info_l2.place(relx=0, rely=.05)
+
+
 
 
 # Check Connection Status in periodic update loop
@@ -1474,26 +1539,30 @@ def task():
 # start the periodic check loop for first time - need this here!!
 root.after(1000, task)
 
+# add Configuration
+Config_menu = tk.Menu(menubar, background='white')
+for i in range(len(ConfigFile.config_list2)):
+    # submenu.add_command(label=ConfigFile.config_list[i], command=lambda : ConfigSelect(selection=i))
+    Config_menu.add_command(label=ConfigFile.config_list2[i]["displayname"], command=lambda s=i: ConfigSelect(selection=s))
+
+menubar.add_cascade(label='Configuration', menu=Config_menu)
+
 # add about item to menu bar
 Help_menu = tk.Menu(menubar, background='white')
 Help_menu.add_command(label="About", command=about)
 Help_menu.add_command(label="Instructions", command=show_instructions)
 
-Help_menu.add_separator()
+# Help_menu.add_separator()
 
-submenu = Menu(Help_menu)
-# automatically scroll thru the list and add to the menu
-#for i in range(len(ConfigFile.config_list)):
-    # submenu.add_command(label=ConfigFile.config_list[i], command=lambda : ConfigSelect(selection=i))
- #   submenu.add_command(label=ConfigFile.config_list[i], command=lambda s=i: ConfigSelect(selection=s))
+#submenu = Menu(Help_menu)
 
 # automatically scroll thru the list and add to the menu the displayname
-for i in range(len(ConfigFile.config_list2)):
+#for i in range(len(ConfigFile.config_list2)):
     # submenu.add_command(label=ConfigFile.config_list[i], command=lambda : ConfigSelect(selection=i))
-    submenu.add_command(label=ConfigFile.config_list2[i]["displayname"], command=lambda s=i: ConfigSelect(selection=s))
+ #   submenu.add_command(label=ConfigFile.config_list2[i]["displayname"], command=lambda s=i: ConfigSelect(selection=s))
 
 
-Help_menu.add_cascade(label='Configuration', menu=submenu, underline=0)
+#Help_menu.add_cascade(label='Configuration', menu=submenu, underline=0)
 menubar.add_cascade(label='Help', menu=Help_menu)
 
 # display the menu
