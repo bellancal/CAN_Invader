@@ -1,0 +1,13 @@
+JUST A WORKPAD FOR COPYING TEST DATA STRINGS
+
+COMMANDS for GUI SOCKET CONTROL:
+GENERAL:
+python pynetcat.py localhost 50001 <data>
+SPECIFIC:
+python pynetcat.py localhost 50001 about
+python pynetcat.py localhost 50001 speakerlf
+python pynetcat.py localhost 50001 speakerrf
+python pynetcat.py localhost 50001 speakerrr
+python pynetcat.py localhost 50001 speakelr
+
+C:\Users\lbellan1\Documents\Pycharm\gui

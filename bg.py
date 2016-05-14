@@ -390,8 +390,8 @@ def quitme():
         cfg.write(open(config_file, "w"))
     disconnect()
     try:
+        s.close()
         servercmd.kill()
-
     except:
         pass
     sys.exit()
@@ -483,6 +483,10 @@ def onepress():
         set_freq()
         set_vol_default(default_volume)
         ReadVIN()
+    else:
+        # close active server
+        disconnect()
+
 
 def testerPon(forceid=None):
     if not User_Connect:
@@ -1017,6 +1021,7 @@ def disconnect():
 
     try:
         servercmd.kill()
+
     except:
         pass
 
@@ -1316,14 +1321,16 @@ def listenloop(s):
                     print("command recd = " + data)
                     if data.find("about")>0:
                         about()
-                    if data.find("speakerlf")>0:
+                    elif data.find("speakerlf")>0:
                         speaker_LF()
-                    if data.find("speakerrf")>0:
+                    elif data.find("speakerrf")>0:
                         speaker_RF()
-                    if data.find("speakerlr")>0:
+                    elif data.find("speakerlr")>0:
                         speaker_LR()
-                    if data.find("speakerrr")>0:
+                    elif data.find("speakerrr")>0:
                         speaker_RR()
+                    elif data.find("startBT")>0:
+                        onepress()
                 except:
                     print(traceback.format_exc())
                     print('Command Execution failed!')
