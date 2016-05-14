@@ -9,6 +9,10 @@ from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE
 import os
 import ConfigFile
 import configparser
+import socket
+import sys
+import threading
+import traceback
 """
 Purpose: Main file that creates the gui using TK widgets for the CAN INVADER control.
 This program will launch the BT server and initiate message using server.  This program will also monitor for server status
@@ -17,19 +21,22 @@ and CAN responses for the diagnostic requests and present these to user.
 Author: Louis V Bellanca / LBELLAN1@FORD.COM
 Date: April 2016 first release
 
+ver2.0 | May 14 2016  major updates:
+-added a new socket server for gui in new thread to monitor for incoming request for button controls - to be used with Klippel tool
 
 """
 
-#TODO:auto  detect presence of amp - need to account different for volume default
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-
+#TODO: allow bat file to select buttons on gui panel. try python -c "import bg;bg.show_instructions()"
+#TODO:fix use case of onepress with server running already - prevent start server from running 2 times if started!!
 
 
 # Define global variables here
 cfg = configparser.ConfigParser()
 engineering_mode = False
 command_error = False
+CREATE_NO_WINDOW = 0x08000000
 # set defaults for the size
 default_sizex = "662"
 default_sizey = "478"
@@ -226,7 +233,7 @@ def CheckTP():
 
 def CheckVIN():
     """"
-    checks for presence of the VIN ECU to query
+    checks for presence of the VIN ECU to query and displays the correct button
     Enter in config file as:
     [VIN]
     ecu = bcm sync, ahu, ipc, bcm, abs - only list 1!!!
@@ -272,6 +279,45 @@ def HideVINbuttons():
     app.getVINbcm_b.place_forget()
     app.getVINipc_b.place_forget()
     app.getVINrcm_b.place_forget()
+
+
+def ReadVIN():
+    """"
+    query the vehicle for the VIN data
+
+    """
+    global VIN_ecu
+    if VIN_ecu == "SYNC":
+        print("get VIN-SYNC")
+        get_VIN_SYNC()
+
+    elif VIN_ecu == "AHU":
+        print("get VIN-AHU")
+        get_VIN_AHU()
+
+    elif VIN_ecu == "ABS":
+        print("get VIN-ABS")
+        get_VIN_ABS()
+
+    elif VIN_ecu == "BCM":
+        print("get VIN-BCM")
+        get_VIN_BCM()
+
+    elif VIN_ecu == "IPC":
+        print("get VIN-IPC")
+        get_VIN_IPC()
+
+    elif VIN_ecu == "RCM":
+        print("get VIN-RCM")
+        get_VIN_RCM()
+
+    elif VIN_ecu == "PCM":
+        print("get VIN-PCM")
+        get_VIN_PCM()
+
+    else:
+        print("No VIN ecu in config")
+
 
 def Hide(action):
     print("hiding =" + str(action))
@@ -345,6 +391,7 @@ def quitme():
     disconnect()
     try:
         servercmd.kill()
+
     except:
         pass
     sys.exit()
@@ -401,7 +448,7 @@ def a_key(event):
 
 
 def about():
-    tkinter.messagebox.showinfo("CAN Invader BT Controller", "Ver 1.3 - April 18, 2016 \r\n Ford Motor Company \r\n Contact:LbeLLan1@Ford.com\r\n")
+    tkinter.messagebox.showinfo("CAN Invader BT Controller", "Ver 2.0 - May 14, 2016 \r\n Ford Motor Company \r\n Contact:LbeLLan1@Ford.com\r\n")
     print("width =" + str(root.winfo_width()))
     print("height =" + str(root.winfo_height()))
     # print (root.winfo_geometry())
@@ -435,7 +482,7 @@ def onepress():
         set_treble()
         set_freq()
         set_vol_default(default_volume)
-
+        ReadVIN()
 
 def testerPon(forceid=None):
     if not User_Connect:
@@ -449,7 +496,7 @@ def testerPon(forceid=None):
         id1 = "," + id1
     if forceid is not None: # forceid takes precedence
         id1 = "," + str(forceid)
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'testerPresentOn' + id1], creationflags=CREATE_NEW_CONSOLE)
+    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'testerPresentOn' + id1], creationflags=CREATE_NO_WINDOW)
 
 
 def testerPoff():
@@ -462,7 +509,7 @@ def testerPoff():
     id1 = tpid_off.get()
     if id1 != "":
         id1 = "," + id1
-    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'testerPresentOff' + id1], creationflags=CREATE_NEW_CONSOLE)
+    p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'testerPresentOff' + id1], creationflags=CREATE_NO_WINDOW)
 
 
 def connect():
@@ -472,21 +519,21 @@ def connect():
     # filepath='"C:\Users\lbellan1\PycharmProjects\gui\start.bat"' C:/Users/lbellan1/PycharmProjects/gui/start.bat
     os.system("start /wait cmd /c bt_connect_only.bat")
     if sp_125_HS.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,hs'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 125 HS")
     elif sp_125_MS.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,ms'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,ms'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 125 MS")
     elif sp_500_MS.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,ms'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,ms'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 500 MS")
     elif sp_500_HS.get():
         print("Set CAN 500 HS")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,hs'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set CAN from ini")
         # no configuration chosen so use default in ini file
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         # CheckCAN(bus_type = cfg['CAN']['busType'].lower(), speed = cfg['CAN']['speed'].lower())
 
     stdout, stderr = p.communicate()
@@ -516,7 +563,7 @@ def radio_on():
     global command_error
     print("Radio On")
     # os.system("start /wait cmd /c radio_on_AHU.bat")
-    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','radioOnahu'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','radioOnahu'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate()
     print(stdout + stderr)
     if stdout.find(b'Error') > 0:
@@ -540,10 +587,10 @@ def set_bass():
 
     if Amp_Present.get():
         print("AMP Set BASS =" + b)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Bass=" + b)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassX,' + b], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -569,10 +616,10 @@ def set_treble():
 
     if Amp_Present.get():
         print("AMP Set Treble =" + t)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Treble=" + t)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebX,' + t], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -591,10 +638,10 @@ def set_freq():
 
     if f != "":
         print("Set Frequency " + f)
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreqX,' + f], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreqX,' + f], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Frequency to default")
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreq'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreq'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     # os.system("start /wait cmd /c setFreqX879.bat")
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -614,10 +661,10 @@ def set_vol1():
 
     if Amp_Present.get():
         print("AMP Set Vol " + str(MasterVol1))
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol " + str(MasterVol1))
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -634,10 +681,10 @@ def set_vol5():
     global command_error
     if Amp_Present.get():
         print("AMP Set Vol 5")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 5")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,05'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     # os.system("start /wait cmd /c setVolumeX5.bat")
     stdout, stderr = p.communicate()
@@ -660,11 +707,11 @@ def set_vol19():
 
     if Amp_Present.get():
         print("AMP Set Vol 13")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 13")
         # os.system("start /wait cmd /c setVolumeX13.bat")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -682,13 +729,13 @@ def set_vol16():
 
     if Amp_Present.get():
         print("AMP Set Vol 5" + str(MasterVol2))
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol " + str(MasterVol2))
         v = format(MasterVol2, '02x')
         # print("Set Vol 16")
         # os.system("start /wait cmd /c setVolumeX13.bat")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -706,11 +753,11 @@ def set_vol22():
 
     if Amp_Present.get():
         print("AMP Set Vol 16")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 16")
         # os.system("start /wait cmd /c setVolumeX13.bat")
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -736,17 +783,17 @@ def set_volX():
         v = format(int(v), '02x')
         if Amp_Present.get():
             print("AMP Set Vol X =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
             print("Set Vol X =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:  # no data entered so assume default defined in setVolumeX command that is 0
         if Amp_Present.get():
             print("AMP Set Vol X =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
             print("Set Vol X =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     # check responses
     stdout, stderr = p.communicate()
@@ -765,10 +812,10 @@ def set_vol_default(v):
     if v != "":
         if Amp_Present.get():
             print("AMP Set Vol Default =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
             print("Set Vol Default =" + v)
-            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
         stdout, stderr = p.communicate()
         if stdout.find(b'Error') > 0:
@@ -795,13 +842,21 @@ def get_VIN_AHU():
     command_error = False
     print("Get VIN ahu")
     # os.system("start /wait cmd /c log_VIN_AHU.bat")
-    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','readVIN'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    p = Popen([sys.executable, "pynetcat.py",'localhost','50000','readVIN'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 
 def get_VIN_ABS():
@@ -819,7 +874,14 @@ def get_VIN_ABS():
         command_error = True
     else:
         command_error = False
-
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 def get_VIN_SYNC():
     if not User_Connect:
@@ -836,6 +898,14 @@ def get_VIN_SYNC():
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 
 def get_VIN_BCM():
@@ -852,6 +922,14 @@ def get_VIN_BCM():
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 # TODO-test PCM get VIN and add button
 def get_VIN_PCM():
@@ -868,6 +946,14 @@ def get_VIN_PCM():
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 
 def get_VIN_RCM():
@@ -885,6 +971,14 @@ def get_VIN_RCM():
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 
 def get_VIN_IPC():
@@ -902,6 +996,14 @@ def get_VIN_IPC():
         command_error = True
     else:
         command_error = False
+        fv = stdout.find(b'vin=')
+        VIN_read = str(stdout)
+        VIN_read = VIN_read[fv + 6:fv + 23]
+        print("VIN = " + VIN_read)
+        info_l4.config(state=NORMAL)
+        info_l4.delete(1.0, END)
+        info_l4.insert(1.0, "VIN = " + VIN_read)
+        info_l4.config(state=DISABLED)
 
 
 def disconnect():
@@ -1168,6 +1270,74 @@ def Sp3_change():
         Speaker3.set(True)
 
 
+def on_closing():
+    # handle the close x press
+    if tkinter.messagebox.askokcancel("Quit", "Do you want to quit?"):
+        # root.destroy()
+        quitme()
+
+
+
+
+# def create_gui_socket():
+#     HOST = 'localhost'   # Symbolic name, meaning all available interfaces
+#     PORT = 50001  # Arbitrary non-privileged port
+#
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     print('Socket created')
+#
+#     # Bind socket to local host and port
+#     try:
+#         s.bind((HOST, PORT))
+#     except socket.error as msg:
+#         print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+#         #sys.exit()
+#
+#     print ('Socket bind complete')
+#
+#     # Start listening on socket
+#     s.listen(5) # set backlog
+#     print('Socket now listening')
+
+
+def listenloop(s):
+    # creates thread that monitors for incoming data to the gui port 50001
+    # to use run this in command line: python pynetcat.py localhost 50001 data
+    # TODO:examine data to call appropriate functions
+    size = 4096
+    while True:
+        try:
+            client, address = s.accept()
+            print("Client " + str(address) + " connected!")
+            data = client.recv(size)
+            if data:
+                try:
+                    data = str(data)
+                    print("command recd = " + data)
+                    if data.find("about")>0:
+                        about()
+                    if data.find("speakerlf")>0:
+                        speaker_LF()
+                    if data.find("speakerrf")>0:
+                        speaker_RF()
+                    if data.find("speakerlr")>0:
+                        speaker_LR()
+                    if data.find("speakerrr")>0:
+                        speaker_RR()
+                except:
+                    print(traceback.format_exc())
+                    print('Command Execution failed!')
+                client.send(b'OK')
+                client.close()
+        except (KeyboardInterrupt, SystemExit):
+            s.close()
+            exit()
+        except socket.timeout:
+            print("Waiting for incoming connection" )
+
+#        channel, addr = s.accept()
+#        print("Connected with", addr)
+
 class App:
 
     def __init__(self, master):
@@ -1189,13 +1359,7 @@ class App:
         # info_l2 = Label(master, text="Connection Status = NOT CONNECTED")
         # info_l2.pack(side=TOP)
 
-        # self.about_b = Button(master, text="??", command=about, bg="black", fg="white")
-        # self.about_b.pack()
-        # self.about_b.place(rely=0, relx=0)
 
-        # self.quit_b = Button(master, text="Quit", command=sys.exit, bg="red", fg="white")
-        # self.hello_b.bind("<Enter>",jump)
-        # self.quit_b.pack(side=BOTTOM)
 
         self.disconnect_b = Button(master, text="Disconnect", command=disconnect, fg="red", bg="white", height=1, width=10, font=font1)
         self.disconnect_b.pack(side=BOTTOM)
@@ -1336,7 +1500,7 @@ class App:
         self.onepress_b.place(rely=.12, relx=0)
         onepress_b_ttp = CreateToolTip(self.onepress_b, "Starts server, configures CAN, TP on, radio on, sets treb bass vol and freq to default")
 
-        self.Test_b = Button(master, text="Test", command=CheckVIN, fg="blue", bg="pink")
+        self.Test_b = Button(master, text="Test", command=NONE, fg="blue", bg="pink")
         self.Test_b.pack()
         self.Test_b.place(rely=.9, relx=0)
 
@@ -1395,6 +1559,16 @@ info_l3 = Label(root, textvariable=loaded_volume, font="12")
 info_l3.pack(side=TOP)
 info_l3.place(relx=.65)
 
+# VIN label
+info_l4 = Text(root, height=1)
+info_l4.insert(1.0,'VIN = <no connection>' )
+info_l4.pack()
+info_l4.place(relx=.65, rely=.05)
+info_l4.configure(bg=root.cget('bg'), relief=FLAT, font="12")
+
+
+
+
 # Define fonts to use
 font1 = font.Font(family='Helvetica', size='14')
 
@@ -1407,12 +1581,6 @@ fin = Entry(root, bd =2, width=4)
 fin.pack()
 fin.place(rely=.13, relx=.8)
 fin_ttp = CreateToolTip(fin, "Enter as freq x 10: 897 for 89.7")
-
-
-#vin = Entry(root, bd=2, width=2)
-#vin.pack()
-#vin.place(rely= speaker_y, relx=.94)
-#vin_ttp = CreateToolTip(vin, "Enter volume steps 0 to 30")
 
 v_scale = Scale(root, from_=0, to=30)
 v_scale.pack()
@@ -1436,7 +1604,7 @@ treb_in_ttp = CreateToolTip(treb_in, "Enter treble -7 to 7. Defaults to 0(nom)")
 
 # create a top level menu
 menubar = Menu(root)
-menubar.add_command(label="Quit!", command=quitme)
+menubar.add_command(label="Quit!", command=on_closing)
 
 # add CAN setup selection to menu bar
 sp_500_HS = tk.BooleanVar()
@@ -1581,4 +1749,35 @@ Hide(True)
 LoadConfig(ConfigFile.config_file_default)
 config_file = ConfigFile.config_file_default
 
+# add handler for the exit
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
+
+
+# set up listening socket
+HOST = 'localhost'   # Symbolic name same as the tcp_server name
+PORT = 50001  # equal to tcpserver port + 1 - needs to be unique to avoid confusion
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print('Socket created')
+
+# Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error as msg:
+    print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+    #sys.exit()
+
+print ('Socket bind complete')
+
+# Start listening on socket
+s.listen(5) # set backlog
+s.settimeout(2)
+print('Socket now listening')
+
+# start new thread for incoming server
+#threading.Thread(target=listenloop, args=(s,)).start()
+listen_thread = threading.Thread(target=listenloop, args=(s,))
+listen_thread.daemon = True
+listen_thread.start()
 root.mainloop()

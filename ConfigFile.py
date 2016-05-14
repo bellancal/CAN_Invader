@@ -8,7 +8,7 @@ User can change the one that load on program intial run by setting the index val
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
 # !!!!!!!CHANGE HERE ONLY BELOW!!!!!!
-index = 1
+index = 8
 # !!!!!!!CHANGE the number only using index define above !!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
@@ -17,7 +17,7 @@ index = 1
 
 # DO NOT CHANGE ANYTHING BELOW.........................................
 config_list2 = []  # master list of dictionary pairs - filename, displayname
-config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"})  # index = 0 NEED TO TEST STILL!!!! TODO-test C346 vehicle
+config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"})  # index = 0 NEED TO TEST STILL!!!! 125K ms, visteon AHU no tweets, ipc/bcm
 config_list2.append({"filename": "oobd_control_S550.ini", "displayname": "S550"})  # index = 1 #use ABS for VIN  500k ms, clarion, sp=2
 config_list2.append({"filename": "oobd_control_B299.ini", "displayname": "B299"})  # index = 2 #use apim for VIN this worked in B299N  IPC works too.  hs 500k, visteon, sp=1
 config_list2.append({"filename": "oobd_control_CD390.ini", "displayname": "CD390"})  # index = 3 NEED TO TEST STILL!!!! TODO-test CD390 Fusion vehicle

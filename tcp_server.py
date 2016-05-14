@@ -32,10 +32,10 @@ try:
     b299mca_cancodes.cancodes_init(args.CONFIG)
     commands = b299mca_cancodes.canFunctionSets
 except:
-    print(50*"*")
+    print(50 * "*")
     print("!!!RFCOMM Connection Error!!!")
     print("---Ensure BT dongle is connected and operating.---")
-    print(50*"*")
+    print(50 * "*")
 # Setup debug vom CLI
 DEBUG = args.DEBUG
 # Setup logging
@@ -128,7 +128,7 @@ def doCommand(command):
         print("Config Result is " + str(r))
         # oobd.configureCAN(ms_hs="ms", reqId=cfg['CAN']['defaultReqID'], speed=["11b", 125], filterCanID=[1,cfg['CAN']['filterStart']], filterMask=[1,cfg['CAN']['filterMask']])
     elif command[:15] == "testerPresentOn":
-        logging.info("+++++Trying command "+command+"...")
+        logging.info("+++++Trying command " + command + "...")
         i = command.find(",")  # added by LVB
         if i > 14:  # added by LVB
             rID = command[i + 1:]
@@ -136,7 +136,7 @@ def doCommand(command):
             rID = None
         oobd.testerPresent(active=True, reqId=rID, interval=int(cfg['CAN']['TesterPresentIntervall']))
     elif command[:16] == "testerPresentOff":
-        logging.info("+++++Trying command "+command+"...")
+        logging.info("+++++Trying command " + command + "...")
         i = command.find(",")  # added by LVB
         if i > 14:  # added by LVB
             rID = command[i + 1:]
@@ -145,7 +145,7 @@ def doCommand(command):
         oobd.testerPresent(active=False, reqId=rID, interval=int(cfg['CAN']['TesterPresentIntervall']))
     elif command[:7] == "readVIN":
         print("read VIN")
-        logging.info("+++++Trying command "+command+"...")
+        logging.info("+++++Trying command " + command + "...")
         command = commands[command]
         if command["access"] == "03":
             oobd.sendCanData(["1003"],reqId=command["reqID"]) # AHU wants the accesslevel to be set even if 2f mode
@@ -162,6 +162,8 @@ def doCommand(command):
             vin_logfile = open('vin.log', 'a')
             vin_logfile.write(timestamp + ": " + vin + "\n")  # Append VIN to logfile
             vin_logfile.close()
+            vinb = str.encode(vin)
+            client.send(b'vin=' + vinb)
         else:
             print("VIN not valid")
             client.send(b'VIN Error')
@@ -192,14 +194,14 @@ def doCommand(command):
     elif command[:5] == "reqID":
         oobd.configureCAN(reqId=command[6:])
     else:
-        logging.info("+++===Trying command "+command+"...")
+        logging.info("+++===Trying command " + command + "...")
         # set unreal value to check later and fill with data passed via command line
         new_data = '-1'
         if command[:10] == "setVolumeX":
                 i = command.find(",")  # added by LVB
                 logging.info("i = " + str(i))
                 if i > 8:
-                    print("Volume X=" + str(command[i+1:]))
+                    print("Volume X=" + str(command[i + 1:]))
                     new_data = command[i+1:]
                     command = command[:10]
 
@@ -319,9 +321,11 @@ if args.server and args.command is None and not args.interactive and not args.li
             try:
                 noOfSockTimeouts += 1
                 if (noOfSockTimeouts % 2) == 1:
-                    print("waiting for connection on port "+cfg['SERVER']['PORT']+"   ", end="\r")
+                   pass
+                   print("I am waiting for connection on port "+cfg['SERVER']['PORT'] + "   ", end="\r")
                 else:
-                    print("waiting for connection on port "+cfg['SERVER']['PORT']+"...", end="\r")
+                    pass
+                    print("waiting for connection on port "+cfg['SERVER']['PORT'] + "...   ", end="\r")
             except:
                 if DEBUG is True:
                     print(traceback.format_exc())
