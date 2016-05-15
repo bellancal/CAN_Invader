@@ -1,7 +1,13 @@
 import socket
 import argparse
 
-parser = argparse.ArgumentParser()
+'''
+General program used for communicating with the active server sockets.
+This program will invoke a socket to transfer the required data
+All commands invoke this program first to parse and send the data to via socket.
+Generic syntax is  python pynetcat.py host port data
+'''
+parser = argparse.ArgumentParser(description='define and parse the cli for socket server')
 parser.add_argument("host")
 parser.add_argument("port")
 parser.add_argument("data")

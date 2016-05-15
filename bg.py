@@ -28,7 +28,6 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-#TODO: allow bat file to select buttons on gui panel. try python -c "import bg;bg.show_instructions()"
 #TODO:fix use case of onepress with server running already - prevent start server from running 2 times if started!!
 
 
@@ -520,7 +519,7 @@ def connect():
     global command_error
     command_error = False
     print("BT connect")
-    # filepath='"C:\Users\lbellan1\PycharmProjects\gui\start.bat"' C:/Users/lbellan1/PycharmProjects/gui/start.bat
+
     os.system("start /wait cmd /c bt_connect_only.bat")
     if sp_125_HS.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -1282,34 +1281,10 @@ def on_closing():
         quitme()
 
 
-
-
-# def create_gui_socket():
-#     HOST = 'localhost'   # Symbolic name, meaning all available interfaces
-#     PORT = 50001  # Arbitrary non-privileged port
-#
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     print('Socket created')
-#
-#     # Bind socket to local host and port
-#     try:
-#         s.bind((HOST, PORT))
-#     except socket.error as msg:
-#         print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
-#         #sys.exit()
-#
-#     print ('Socket bind complete')
-#
-#     # Start listening on socket
-#     s.listen(5) # set backlog
-#     print('Socket now listening')
-
-
 def listenloop(s):
     # creates thread that monitors for incoming data to the gui port 50001
     # to use run this in command line: python pynetcat.py localhost 50001 data
-    # TODO:examine data to call appropriate functions
-    size = 4096
+    size = 1024
     while True:
         try:
             client, address = s.accept()
@@ -1331,6 +1306,13 @@ def listenloop(s):
                         speaker_RR()
                     elif data.find("startBT")>0:
                         onepress()
+                    elif data.find("speakerAll")>0:
+                        speaker_All()
+                    elif data.find("speakerCenter")>0:
+                        speaker_Center()
+                    elif data.find("speakerSub")>0:
+                        speaker_Sub()
+
                 except:
                     print(traceback.format_exc())
                     print('Command Execution failed!')
@@ -1342,8 +1324,6 @@ def listenloop(s):
         except socket.timeout:
             print("Waiting for incoming connection" )
 
-#        channel, addr = s.accept()
-#        print("Connected with", addr)
 
 class App:
 
