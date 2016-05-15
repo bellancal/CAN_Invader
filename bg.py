@@ -581,12 +581,11 @@ def set_bass():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    # os.system("start /wait cmd /c setBassX.bat")
-    b = bass_in.get()
+    b = bass_scale.get()
     if b == "":
         b = '0E'  # max
     else:
-        b = format(int(b) + 7,'02X')
+        b = format(int(b) + 7, '02X')
 
     if Amp_Present.get():
         print("AMP Set BASS =" + b)
@@ -610,7 +609,7 @@ def set_treble():
     global command_error
     print("Set Treble")
     # os.system("start /wait cmd /c setTrebX.bat")
-    t = treb_in.get()
+    t = treb_scale.get()
     if t == "":
         t = '07'  # nominal
     else:
@@ -1369,12 +1368,12 @@ class App:
         self.setBass_b = Button(master, text="Set Bass", command=set_bass, fg="blue", bg="yellow")
         self.setBass_b.pack()
         self.setBass_b.place(rely=.2, relx=.2)
-        setBass_b_ttp = CreateToolTip(self.setBass_b, "Set Bass. Enter value on right or leave blank for default.")
+        setBass_b_ttp = CreateToolTip(self.setBass_b, "Set Bass. Select value using slider on right.")
 
         self.setTreb_b = Button(master, text="Set Treb", command=set_treble, fg="blue", bg="yellow")
         self.setTreb_b.pack()
         self.setTreb_b.place(rely=.2, relx=.34)
-        setTreb_b_ttp = CreateToolTip(self.setTreb_b, "Set Treble. Enter value on right or leave blank for default.")
+        setTreb_b_ttp = CreateToolTip(self.setTreb_b, "Set Treble. Select value using slider on right.")
 
         self.getVINahu_b = Button(master, text="VIN AHU", command=get_VIN_AHU, fg="white", bg="brown", height=2, width=7, font=font1)
         self.getVINahu_b.pack()
@@ -1571,22 +1570,32 @@ fin_ttp = CreateToolTip(fin, "Enter as freq x 10: 897 for 89.7")
 
 v_scale = Scale(root, from_=0, to=30)
 v_scale.pack()
-v_scale.place(rely=speaker_y-.12, relx=.935)
+v_scale.place(rely=speaker_y - .12, relx=.935)
 
 tpid_off = Entry(root, bd=2, width=3)
 tpid_off.pack()
 tpid_off.place(rely=.92, relx=.82)
 tpid_off_ttp = CreateToolTip(tpid_off, "Enter ECU ID to disable tester present message. ex: 7DF")
 
-bass_in = Entry(root, bd=2, width=2)
-bass_in.pack()
-bass_in.place(rely=.21, relx=.285)
-bass_in_ttp = CreateToolTip(bass_in, "Enter bass -7 to 7. Defaults to 7(max)")
+# bass_in = Entry(root, bd=2, width=2)
+# bass_in.pack()
+# bass_in.place(rely=.21, relx=.285)
+# bass_in_ttp = CreateToolTip(bass_in, "Enter bass -7 to 7. Defaults to 7(max)")
 
-treb_in = Entry(root, bd=2, width=2)
-treb_in.pack()
-treb_in.place(rely=.21, relx=.427)
-treb_in_ttp = CreateToolTip(treb_in, "Enter treble -7 to 7. Defaults to 0(nom)")
+bass_scale = Scale(root, from_=7, to=-7, showvalue=7, width=10, length=50, sliderlength=20)
+bass_scale.pack()
+bass_scale.place(rely=.17, relx=.275)
+bass_scale.set(7)
+
+# treb_in = Entry(root, bd=2, width=2)
+# treb_in.pack()
+# treb_in.place(rely=.21, relx=.427)
+# treb_in_ttp = CreateToolTip(treb_in, "Enter treble -7 to 7. Defaults to 0(nom)")
+
+treb_scale = Scale(root, from_=7, to=-7, showvalue=7, width=10, length=50, sliderlength=20)
+treb_scale.pack()
+treb_scale.place(rely=.17, relx=.427)
+treb_scale.set(0)
 
 
 # create a top level menu
