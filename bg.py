@@ -459,7 +459,25 @@ def show_instructions():
 
 
 def start_server():
-    global command_error
+    # see if already connected
+    if User_Connect:
+        print("server already connected")
+        tkinter.messagebox.showinfo("Server Started", "Server already started and connected!")
+        return
+
+    # see if server already running but not connected
+    try:
+        server_status = servercmd.poll()
+        print ("Check server status = " + str(server_status) + "(None = running)")
+        if server_status is None:
+                tkinter.messagebox.showinfo("Server Started", "Server already started but not connected!")
+                return
+    except:
+        print("server status run check failed (means not running yet).")
+
+
+
+    global command_error,  command_error
     command_error = False
 
     print("starting server")
@@ -469,9 +487,27 @@ def start_server():
 
 def onepress():
     global command_error, default_volume
+    if User_Connect:
+        print("already connected")
+        tkinter.messagebox.showinfo("Server Running", "Server already started and connected!")
+        return
+
     print("onepress started")
     command_error = False
-    start_server()
+
+    # see if server already running but not connected
+    try:
+        server_status = servercmd.poll()
+        print ("Check server status = " + str(server_status) + "(None = running)")
+        if server_status is None:
+            print( "Server already started but not connected!")
+        else: # number means tereminated and need to start again
+            start_server()
+
+    except: # can occur first time server_status is checked since servercmd not defined
+        print("server not running - starting now")
+        start_server()
+
     # if connect not successful then do not perform other commands!
     a = connect()
     if a:
@@ -556,7 +592,7 @@ def connect():
     else:
         User_Connect = False
         print("Failed to connect via BT!")
-        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure server is running and BT dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle." )
+        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure BlueTooth dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle diagnostic port." )
         return False
 
 
@@ -1019,6 +1055,10 @@ def disconnect():
     global User_Connect
     User_Connect = False
     command_error = False
+    info_l4.config(state=NORMAL)
+    info_l4.delete(1.0, END)
+    info_l4.insert(1.0, "VIN = <no connection>")
+    info_l4.config(state=DISABLED)
 
     try:
         servercmd.kill()
