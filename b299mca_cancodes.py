@@ -1,4 +1,4 @@
-#
+    #
 # B299MCA commands for controlling the KLIPPEL GmbH Test system
 # Schema for the CAN sequence tuples are:
 # command_tuple = ["ECU_REQ_ID", "command service", "DID", "parameter", "access level required", "data to be sent"]
@@ -9,7 +9,6 @@
 #
 
 import configparser
-#from ConfigFile import *
 
 cfg = configparser.ConfigParser()
 global canFunctionSets

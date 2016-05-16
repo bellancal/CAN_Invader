@@ -52,7 +52,7 @@ def ConfigSelect(selection=None):
 
 def LoadConfig(filetoload):
     # sub to check the config file and load data
-    global sizex, sizey, fileOK, config_file
+    global sizex, sizey, fileOK, config_file, loaded_freq
     # refer to the file to see if a config is defined
     fileOK = cfg.read(filetoload)
 
@@ -85,6 +85,7 @@ def LoadConfig(filetoload):
         # change the window to the defined size
         root.geometry("%sx%s" % (sizex, sizey))
 
+        loaded_freq.set('Default Freq = ' + cfg['DUT']['FM_FREQ'])
 
 
     else:
@@ -153,7 +154,7 @@ def CheckAMP():
         if amptype == '1':
             Amp_Present.set(True)
             print("AMP is present")
-            default_volume =  cfg['AMP']['VOLUME']
+            default_volume = cfg['AMP']['VOLUME']
 
         elif amptype == '0':
             Amp_Present.set(False)
@@ -161,7 +162,6 @@ def CheckAMP():
             default_volume =  cfg['DUT']['VOLUME_FRONT']
         else:
             print("Invalid AMP type defined - check config")
-
 
     else:
         print("No AMP type found")
@@ -550,6 +550,7 @@ def connect():
         # CheckAHU()
         # CheckSpeaker()
         # CheckVIN()
+        ReadVIN()
         return True
 
     else:
@@ -638,13 +639,17 @@ def set_freq():
     global command_error
     f = fin.get()
 
+
     if f != "":
-        print("Set Frequency " + f)
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreqX,' + f], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        f_float = max(float(f), 87.5)  # needs to be at least 87.5
+        f_float = min(f_float, 108)  # limit to 108
+        fint = int(f_float * 10)
+        print("Set Frequency " + f + " " + str(fint))
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreqX,' + str(fint)], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Frequency to default")
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreq'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    # os.system("start /wait cmd /c setFreqX879.bat")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setFreq'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
@@ -735,8 +740,6 @@ def set_vol16():
     else:
         print("Set Vol " + str(MasterVol2))
         v = format(MasterVol2, '02x')
-        # print("Set Vol 16")
-        # os.system("start /wait cmd /c setVolumeX13.bat")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
@@ -1552,8 +1555,12 @@ info_l4.pack()
 info_l4.place(relx=.65, rely=.05)
 info_l4.configure(bg=root.cget('bg'), relief=FLAT, font="12")
 
-
-
+# Freq label
+loaded_freq = StringVar()
+loaded_freq.set('Default Freq = ')
+info_l5 = Label(root, textvariable=loaded_freq, font="12")
+info_l5.pack()
+info_l5.place(relx=.78, rely=.19)
 
 # Define fonts to use
 font1 = font.Font(family='Helvetica', size='14')
@@ -1563,10 +1570,10 @@ tpid.pack()
 tpid.place(rely=.76, relx=.82)
 tpid_ttp = CreateToolTip(tpid, "Enter optional ECU ID for tester present on message. ex: 7DF")
 
-fin = Entry(root, bd =2, width=4)
+fin = Entry(root, bd =2, width=5)
 fin.pack()
 fin.place(rely=.13, relx=.8)
-fin_ttp = CreateToolTip(fin, "Enter as freq x 10: 897 for 89.7")
+fin_ttp = CreateToolTip(fin, "Enter valid FM freq from 87.50 to 108.00")
 
 v_scale = Scale(root, from_=0, to=30)
 v_scale.pack()
@@ -1747,7 +1754,6 @@ config_file = ConfigFile.config_file_default
 
 # add handler for the exit
 root.protocol("WM_DELETE_WINDOW", on_closing)
-
 
 
 # set up listening socket
