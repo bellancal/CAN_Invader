@@ -87,6 +87,10 @@ def LoadConfig(filetoload):
 
         loaded_freq.set('Default Freq = ' + cfg['DUT']['FM_FREQ'])
 
+        #set bass and trebel to defaults
+        bass_scale.set(7)
+        treb_scale.set(0)
+
 
     else:
         print("Missing Config File!!" + str(fileOK))
