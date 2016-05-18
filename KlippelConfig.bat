@@ -1,0 +1,1 @@
+python pynetcat.py localhost 50001 config=oobd_control_U502.ini

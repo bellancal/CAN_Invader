@@ -29,7 +29,8 @@ ver2.0 | May 14 2016  major updates:
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
 #TODO:fix use case of onepress with server running already - prevent start server from running 2 times if started!!
-
+#TODO:Add klippel intereface to set remote configuration for program
+#TODO:Add klippel interface to disconnect
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -90,6 +91,9 @@ def LoadConfig(filetoload):
         #set bass and trebel to defaults
         bass_scale.set(7)
         treb_scale.set(0)
+
+        #clear frequency to restore default
+        fin.delete(0, END)
 
 
     else:
@@ -1358,6 +1362,13 @@ def listenloop(s):
                         speaker_Center()
                     elif data.find("speakerSub")>0:
                         speaker_Sub()
+                    elif data.find("disconnect")>0:
+                        disconnect()
+                    elif data.find("config")>0:
+                       filename = data[data.find('=') + 1:]
+                       filename = str(filename).replace("'","")  # remove quotes
+                       print("Klippel config :" + filename)
+                       LoadConfig(filename)
 
                 except:
                     print(traceback.format_exc())

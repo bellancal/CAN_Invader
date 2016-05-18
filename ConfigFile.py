@@ -21,7 +21,7 @@ config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"}
 config_list2.append({"filename": "oobd_control_S550.ini", "displayname": "S550"})  # index = 1 #use ABS for VIN  500k ms, clarion, sp=2
 config_list2.append({"filename": "oobd_control_B299.ini", "displayname": "B299"})  # index = 2 #use apim for VIN this worked in B299N  IPC works too.  hs 500k, visteon, sp=1
 config_list2.append({"filename": "oobd_control_CD390.ini", "displayname": "CD390"})  # index = 3 NEED TO TEST STILL!!!! TODO-test CD390 Fusion vehicle
-config_list2.append({"filename": "oobd_control_CD391.ini", "displayname": "CD391"})  # index = 4 NEED TO TEST STILL!!!! TODO-test CD391 vehicle
+config_list2.append({"filename": "oobd_control_CD391.ini", "displayname": "CD391"})  # index = 4 ms 500k, Panasonic + tweeters, sub, VIN=rcm + abs
 config_list2.append({"filename": "oobd_control_CD520.ini", "displayname": "CD520"})  # index = 5 use IPC for VIN on C520N or BCM OK ?, ms 125k, panasonic escape
 config_list2.append({"filename": "oobd_control_CD539.ini", "displayname": "CD539"})  # index = 6 ms 500k, visteon, sp=1 edge
 config_list2.append({"filename": "oobd_control_V408.ini", "displayname": "V408"})  # index = 7 hs 125k, panasonic, sp=1 abs=? TODO-test other configurations of V408
