@@ -14,7 +14,8 @@ index = 8
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
 # !!!!!!!CHANGE HERE ONLY ABOVE!!!!!!
 
-
+# NOTE the paths in the bat files Klippel*.bat are PC dependent and need to be changed for each PC install!!
+# NOTE for RCM/PCM/ABS to read back VIN IGNITION MUST BE RUNNING/ON!!!!
 # DO NOT CHANGE ANYTHING BELOW.........................................
 config_list2 = []  # master list of dictionary pairs - filename, displayname
 config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"})  # index = 0 NEED TO TEST STILL!!!! 125K ms, visteon AHU no tweets, ipc/bcm
@@ -26,7 +27,7 @@ config_list2.append({"filename": "oobd_control_CD520.ini", "displayname": "CD520
 config_list2.append({"filename": "oobd_control_CD539.ini", "displayname": "CD539"})  # index = 6 ms 500k, visteon, sp=1 edge
 config_list2.append({"filename": "oobd_control_V408.ini", "displayname": "V408"})  # index = 7 hs 125k, panasonic, sp=1 abs=? TODO-test other configurations of V408
 config_list2.append({"filename": "oobd_control_U502.ini", "displayname": "U502"})  # index = 8 use ABS or RCM for VIN  500k ms, clarion, sp=2
-config_list2.append({"filename": "oobd_control_P552.ini", "displayname": "P552"})  # index = 9 # use 500k ms, clarion, sp=2, SYNC for VIN works in the GEN1.1 GEN2/3?? ABS does NOT work!!! RCM works too
+config_list2.append({"filename": "oobd_control_P552.ini", "displayname": "P552"})  # index = 9 # use 500k ms, clarion, sp=2, SYNC for VIN works in the GEN1.1 GEN2/3?? ABS does NOT work!!! RCM works too -
 config_list2.append({"filename": "oobd_control_MKT_amp.ini", "displayname": "MKT"})  # index = 10 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
 config_list2.append({"filename": "test.ini", "displayname": "test only"})  # index = 10 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
 

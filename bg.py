@@ -150,7 +150,7 @@ def CheckSpeaker():
 
 def CheckAMP():
     """
-    checks for AMP in the ini file and sets program accordingly - also determines the default volume setting
+    Run as part of load config only.  checks for AMP in the ini file and sets program accordingly - also determines the default volume setting
     Enter in config file as:
     [AMP]
     present = 1 | 0
@@ -167,18 +167,23 @@ def CheckAMP():
         elif amptype == '0':
             Amp_Present.set(False)
             print("No AMP present")
-            default_volume =  cfg['DUT']['VOLUME_FRONT']
+            default_volume = cfg['DUT']['VOLUME_FRONT']
         else:
             print("Invalid AMP type defined - check config")
 
     else:
-        print("No AMP type found")
-        default_volume =  cfg['DUT']['VOLUME_FRONT']
+        print("No AMP type found during autocheck")
+        default_volume = cfg['DUT']['VOLUME_FRONT']
 
     loaded_volume.set('Default Volume Setting = ' + default_volume)
 
 
 def AMP_autocheck():
+    """
+    Run each time a BT connection is made and will force the AMP setting based on results and is independent of the
+    config.ini file.
+    """
+
     global default_volume
     print("Auto check for AMP")
     # do auto check for AMP
@@ -238,6 +243,7 @@ def CheckTP():
     else:
         print("No additional TP")
 
+
 def CheckVIN():
     """"
     checks for presence of the VIN ECU to query and displays the correct button
@@ -278,6 +284,7 @@ def CheckVIN():
 
     else:
         print("No VIN ecu in config")
+
 
 def HideVINbuttons():
     app.getVINahu_b.place_forget()
