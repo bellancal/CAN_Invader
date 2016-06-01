@@ -346,7 +346,16 @@ def cancodes_init(config_file):
                      "access": '03',
                      "data": 'bfffffff'}
 
-    # Enables only the subwoofer
+    #  Enables only the center speaker 4 bytes for AMP
+    AMP_set_cntr_on_4 = {"reqID": '783',
+                     "cmd": '2f',
+                     "DID": '8003',
+                     "parameter": '03',
+                     "access": '03',
+                     "data": 'bfffffff'}
+
+
+    #  Enables only the subwoofer
     set_subwoofer_on = {"reqID": '727',
                         "cmd": '2f',
                         "DID": '8003',
@@ -354,7 +363,7 @@ def cancodes_init(config_file):
                         "access": '03',
                         "data": '7fffffffffffffff'}
 
-    # Enables only the subwoofer    4 bytes for Clarion
+    #  Enables only the subwoofer    4 bytes for Clarion
     set_subwoofer_on_4 = {"reqID": '727',
                           "cmd": '2f',
                           "DID": '8003',
@@ -362,7 +371,7 @@ def cancodes_init(config_file):
                           "access": '03',
                           "data": '7fffffff'}
 
-    # Enables only the subwoofer with AMP   4 bytes for Clarion
+    #  Enables only the subwoofer with AMP   4 bytes for Clarion
     AMP_set_subwoofer_on_4 = {"reqID": '783',
                               "cmd": '2f',
                               "DID": '8003',
@@ -485,6 +494,7 @@ def cancodes_init(config_file):
                        "speakerEnableLR": set_lr_on,
                        "speakerEnableCntr": set_cntr_on,
                        "speakerEnableCntrtwt": set_cntr_on_twt,
+                       "AMPspeakerEnableCntr": AMP_set_cntr_on_4,
                        "speakerEnableSub": set_subwoofer_on,
                        "speakerEnableRF4": set_rf_on_4,  # for clarion
                        "speakerEnableRFtwt4": set_rf_on_twt_4,

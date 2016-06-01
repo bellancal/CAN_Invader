@@ -1170,7 +1170,12 @@ def speaker_RF():
         return
     global command_error
     print("Speaker RF")
-    if AHU_Clar.get():
+
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
         if Speaker1.get():
             print("AHU=Clar, Speaker=1")
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1200,7 +1205,12 @@ def speaker_LR():
         return
     global command_error
     print("Speaker LR")
-    if AHU_Clar.get():
+
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
         if Speaker1.get():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
@@ -1228,7 +1238,11 @@ def speaker_RR():
         return
     global command_error
     print("Speaker RR")
-    if AHU_Clar.get():
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
         if Speaker1.get():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
@@ -1256,7 +1270,10 @@ def speaker_All():
         return
     global command_error
     print("Speaker All")
-    if AHU_Clar.get():
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+    elif AHU_Clar.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
     elif AHU_Pana.get():
@@ -1281,7 +1298,12 @@ def speaker_Center():
     # os.system("start /wait cmd /c speakerEnableCntr_Clarion.bat")
     global command_error
     print("Speaker Center")
-    if AHU_Clar.get():
+
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableCntr'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
     elif AHU_Pana.get():
@@ -1306,7 +1328,12 @@ def speaker_Sub():
     print("Speaker Sub")
     # os.system("start /wait cmd /c speakerEnableSub_Clarion.bat")
     global command_error
-    if AHU_Clar.get():
+
+    if Amp_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableSub4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
     elif AHU_Pana.get():
