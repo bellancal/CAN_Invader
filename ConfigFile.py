@@ -25,7 +25,7 @@ config_list2.append({"filename": "oobd_control_CD390.ini", "displayname": "CD390
 config_list2.append({"filename": "oobd_control_CD391.ini", "displayname": "CD391"})  # index = 4 ms 500k, Panasonic + tweeters, sub, VIN=rcm + abs
 config_list2.append({"filename": "oobd_control_C520.ini", "displayname": "C520"})  # index = 5 use IPC for VIN on C520N or BCM OK ?, ms 125k, panasonic escape
 config_list2.append({"filename": "oobd_control_CD539.ini", "displayname": "CD539"})  # index = 6 ms 500k, visteon, sp=1 edge
-config_list2.append({"filename": "oobd_control_V408.ini", "displayname": "V408"})  # index = 7 hs 125k, panasonic, sp=1 abs=? TODO-test other configurations of V408
+config_list2.append({"filename": "oobd_control_V408.ini", "displayname": "V408-US"})  # index = 7 hs 125k, visteon, sp=1, vin ipc+bcm TODO-test other configurations of V408
 config_list2.append({"filename": "oobd_control_U502.ini", "displayname": "U502"})  # index = 8 use ABS or RCM for VIN  500k ms, clarion, sp=2
 config_list2.append({"filename": "oobd_control_P552.ini", "displayname": "P552"})  # index = 9 # use 500k ms, clarion, sp=2, SYNC for VIN works in the GEN1.1 GEN2/3?? ABS does NOT work!!! RCM works too -
 config_list2.append({"filename": "oobd_control_MKT_amp.ini", "displayname": "MKT"})  # index = 10 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on

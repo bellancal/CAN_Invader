@@ -216,13 +216,13 @@ def cancodes_init(config_file):
                     "access": '03',
                     "data": '30fcffff'}
 
-    # Enables all speakers  8 bytes for panasonic
+    # Enables all speakers  8 bytes for panasonic and visteon
     set_all_on = {"reqID": '727',
                   "cmd": '2f',
                   "DID": '8003',
                   "parameter": '03',
                   "access": '03',
-                  "data": '30fcffffffffffff'}
+                  "data": '30e3ffffffffffff'} # TODO: try 30e3ffffffffff
 
     # Enables only the right front speaker
     set_rf_on = {"reqID": '727',
