@@ -12,6 +12,11 @@ import datetime
 import traceback
 #import ConfigFile
 
+# Define some variables
+ # steps for the percentage instead of 0-30 input
+volume_steps = ['00', '05', '0d', '16', '1e', '27', '2f', '38', '40', '49', '51', '5a', '62', '6b', '73', '7c', '84',
+                    '8d', '95', '9e', 'a6', 'af', 'b7', 'c0', 'c8', 'd1', 'd9', 'e2', 'ea', 'f3', 'fb']
+
 # Set up the CLI parser 
 parser = argparse.ArgumentParser(prog="OOBD-TCP-Server", description='A simple TCP server for controlling OOBD command sequences for automated processes', epilog='This comes with NO warranty for any use, use it at your own risk!')
 parser.add_argument('-s', '--server', action="store_true", help='Start in server-mode, accepting tcp connections at the port specified in the config')
@@ -202,15 +207,23 @@ def doCommand(command):
                 logging.info("i = " + str(i))
                 if i > 8:
                     print("Volume X=" + str(command[i + 1:]))
-                    new_data = command[i+1:]
+                    new_data = command[i + 1:]
                     command = command[:10]
+
+        if command[:14] == "setVolumeFront":  # use for visteon GAP
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 12:
+                    print("Volume X=" + str(command[i + 1:]))
+                    new_data = volume_steps[int(command[i + 1:])]
+                    command = command[:14]
 
         if command[:13] == "AMPsetVolumeX":
                 i = command.find(",")  # added by LVB
                 logging.info("i = " + str(i))
                 if i > 8:
                     print("AMP Volume X=" + str(command[i+1:]))
-                    new_data = command[i+1:]
+                    new_data = command[i + 1:]
                     command = command[:13]
 
         if command[:8] == "setBassX":

@@ -52,11 +52,11 @@ def cancodes_init(config_file):
 
     # Sets the volume to value given in the config
     set_volume_front = {"reqID": '727',
-                    "cmd": '2e',
+                    "cmd": '2f',
                     "DID": '833b',
                     "parameter": '03',
                     "access": '03',
-                    "data": volume_steps[int(cfg['DUT']['VOLUME_FRONT'])]}
+                    "data": '00'} # 0 is used if no value sent
 
     # some visteon may use 0xFD28?? 2E
     # Sets the volume to value given in the config
@@ -166,7 +166,7 @@ def cancodes_init(config_file):
                  "access": '03',
                  "data": 'fd ff ff ff ff ff ff ff'}
 
-    # Enables only the left front speaker  for Clarion AHU uses 4 bytes only
+    # Enables only the left front speaker  for Clarion AHU uses 4 bytes only and visteon GAP
     set_lf_on_4 = {"reqID": '727',
                    "cmd": '2f',
                    "DID": '8003',
@@ -206,9 +206,9 @@ def cancodes_init(config_file):
                         "DID": '8003',
                         "parameter": '03',
                         "access": '03',
-                        "data": '30fcffff'}
+                        "data": '30fcffff'} # TODO: try 30e3ffff??
 
-    # Enables all speakers  4 bytes for Clarion
+    # Enables all speakers  4 bytes for Clarion and Visteon GAP
     set_all_on_4 = {"reqID": '727',
                     "cmd": '2f',
                     "DID": '8003',
@@ -233,7 +233,7 @@ def cancodes_init(config_file):
                  "data": 'fe ff ff ff ff ff ff ff'}
 
 
-    # Enables only the right front speaker 4 bytes for Clarion
+    # Enables only the right front speaker 4 bytes for Clarion and Visteon GAP
     set_rf_on_4 = {"reqID": '727',
                    "cmd": '2f',
                    "DID": '8003',
@@ -314,21 +314,21 @@ def cancodes_init(config_file):
                    "access": '03',
                    "data": 'f7ffffff'}
 
-    # Enables only the center speaker tweeter
+    # Enables the center speaker & tweeter for visteon
     set_cntr_on_twt = {"reqID": '727',
                        "cmd": '2f',
                        "DID": '8003',
                        "parameter": '03',
                        "access": '03',
-                       "data": 'ffefffffffffffff'}
+                       "data": 'bfefffffffffffff'}
 
-    # Enables only the center speaker tweeter 4 bytes for Clarion
+    # Enables  the center speaker & tweeter 4 bytes for Clarion
     set_cntr_on_twt_4 = {"reqID": '727',
                          "cmd": '2f',
                          "DID": '8003',
                          "parameter": '03',
                          "access": '03',
-                         "data": 'ffefffff'}
+                         "data": 'bfefffff'}
 
     # Enables only the center speaker
     set_cntr_on = {"reqID": '727',
@@ -337,6 +337,7 @@ def cancodes_init(config_file):
                    "parameter": '03',
                    "access": '03',
                    "data": 'bfffffffffffffff'}
+
     # Enables only the center speaker 4 bytes for Clarion
     set_cntr_on_4 = {"reqID": '727',
                      "cmd": '2f',
@@ -460,7 +461,7 @@ def cancodes_init(config_file):
 
     canFunctionSets = {"setFreq": set_freq,
                        "setFreqX": set_freq_x,  # x in freq x 10 ex 983 = 98.3
-                       "setVolumeFront": set_volume_front,
+                       "setVolumeFront": set_volume_front, # use for GAP
                        "setVolumeRear": set_volume_rear,
                        "setBassVisteon": set_bass_visteon,
                        "setTrebVisteon": set_treb_visteon,

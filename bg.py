@@ -28,9 +28,7 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-#TODO:fix use case of onepress with server running already - prevent start server from running 2 times if started!!
-#TODO:Add klippel intereface to set remote configuration for program
-#TODO:Add klippel interface to disconnect
+#TODO: check the speaker control for AMP
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -69,6 +67,7 @@ def LoadConfig(filetoload):
         CheckAHU()
         CheckSpeaker()
         CheckVIN()
+        CheckBassTreb()
         CheckCAN(bus_type=cfg['CAN']['busType'].lower(), speed=cfg['CAN']['speed'].lower())
         # if the config file does not have the section 'SIZE', then add it to the config-file
         if not cfg.has_section('SIZE'):
@@ -89,8 +88,8 @@ def LoadConfig(filetoload):
         loaded_freq.set('Default Freq = ' + cfg['DUT']['FM_FREQ'])
 
         #set bass and trebel to defaults
-        bass_scale.set(7)
-        treb_scale.set(0)
+        # bass_scale.set(7)
+        # treb_scale.set(0)
 
         #clear frequency to restore default
         fin.delete(0, END)
@@ -101,6 +100,23 @@ def LoadConfig(filetoload):
         tkinter.messagebox.showinfo("Config File Error", "The specified configuration file could not be found:" + filetoload )
         loaded_config.set("Config file not found!")
 
+
+def CheckBassTreb():
+    print("Check bass and treble values")
+    if cfg.has_section('BASS'):
+        bass_default = int(cfg['BASS']['VALUE'])
+    else:
+        bass_default = 7
+
+    if cfg.has_section('TREBLE'):
+        treb_default = int(cfg['TREBLE']['VALUE'])
+    else:
+        treb_default = 0
+
+    print("Bass default = " + str(bass_default))
+    print("Treb default = " + str(treb_default))
+    bass_scale.set(bass_default)
+    treb_scale.set(treb_default)
 
 def CheckCAN(bus_type=None, speed=None):
     # set gui to match default setting
@@ -218,6 +234,9 @@ def CheckAHU():
         elif ahutype == 'visteon':
             AHU_Vist.set(True)
             AHU_changeV()
+        elif ahutype == 'visteon-gap':
+            AHU_VistGap.set(True)
+            AHU_changeVGap()
         else:
             print("Invalid AHU type defined - check config")
     else:
@@ -720,6 +739,9 @@ def set_vol1():
     if Amp_Present.get():
         print("AMP Set Vol " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set Vol GAP " + str(MasterVol1))
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -740,6 +762,9 @@ def set_vol5():
     if Amp_Present.get():
         print("AMP Set Vol 5")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set Vol GAP 5" )
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 5")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -766,6 +791,9 @@ def set_vol19():
     if Amp_Present.get():
         print("AMP Set Vol 13")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set Vol GAP 13")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 13")
         # os.system("start /wait cmd /c setVolumeX13.bat")
@@ -788,6 +816,9 @@ def set_vol16():
     if Amp_Present.get():
         print("AMP Set Vol 5" + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set Vol GAP " + str(MasterVol2))
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol " + str(MasterVol2))
         v = format(MasterVol2, '02x')
@@ -810,6 +841,9 @@ def set_vol22():
     if Amp_Present.get():
         print("AMP Set Vol 16")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set Vol GAP 16")
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
         print("Set Vol 16")
         # os.system("start /wait cmd /c setVolumeX13.bat")
@@ -840,15 +874,21 @@ def set_volX():
         if Amp_Present.get():
             print("AMP Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        elif AHU_VistGap.get():
+            print("Set Vol GAP " + v)
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
             print("Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:  # no data entered so assume default defined in setVolumeX command that is 0
         if Amp_Present.get():
-            print("AMP Set Vol X =" + v)
+            print("AMP Set Vol X = 0")
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        elif AHU_VistGap.get():
+            print("Set Vol GAP = 0")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
-            print("Set Vol X =" + v)
+            print("Set Vol X = 0")
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     # check responses
@@ -869,6 +909,10 @@ def set_vol_default(v):
         if Amp_Present.get():
             print("AMP Set Vol Default =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        elif AHU_VistGap.get():
+            print("Set Vol GAP default")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
         else:
             print("Set Vol Default =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -1091,7 +1135,7 @@ def speaker_LF():
     print("Speaker LF")
 
     # Check for AMP first
-    if  Amp_Present.get():
+    if Amp_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     # then check by AHU and speaker type
     elif AHU_Clar.get():
@@ -1104,7 +1148,7 @@ def speaker_LF():
             print("Panasonic")
             # os.system("start /wait cmd /c speakerEnableLFtwt_Clarion.bat")
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Vist.get():
+    elif AHU_Vist.get() or AHU_VistGap.get():
             # print("Visteon")
             if Speaker1.get():
                 print("AHU=Visteon, Speaker=1")
@@ -1135,7 +1179,7 @@ def speaker_RF():
     elif AHU_Pana.get():
         # os.system("start /wait cmd /c speakerEnableRFtwt_Panasonic.bat")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Vist.get():
+    elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             print("AHU=Visteon, Speaker=1")
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRF'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1164,7 +1208,7 @@ def speaker_LR():
     elif AHU_Pana.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableLR_Panasonic.bat")
-    elif AHU_Vist.get():
+    elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
@@ -1192,7 +1236,7 @@ def speaker_RR():
     elif AHU_Pana.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableRR_Panasonic.bat")
-    elif AHU_Vist.get():
+    elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
@@ -1218,7 +1262,7 @@ def speaker_All():
     elif AHU_Pana.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
-    elif AHU_Vist.get():
+    elif AHU_Vist.get() or AHU_VistGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Visteon.bat")
 
@@ -1234,8 +1278,25 @@ def speaker_Center():
     if not User_Connect:
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
+    # os.system("start /wait cmd /c speakerEnableCntr_Clarion.bat")
+    global command_error
     print("Speaker Center")
-    os.system("start /wait cmd /c speakerEnableCntr_Clarion.bat")
+    if AHU_Clar.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
+    elif AHU_Pana.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
+    elif AHU_Vist.get() or AHU_VistGap.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Visteon.bat")
+
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
 
 
 def speaker_Sub():
@@ -1243,7 +1304,24 @@ def speaker_Sub():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     print("Speaker Sub")
-    os.system("start /wait cmd /c speakerEnableSub_Clarion.bat")
+    # os.system("start /wait cmd /c speakerEnableSub_Clarion.bat")
+    global command_error
+    if AHU_Clar.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
+    elif AHU_Pana.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt_4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
+    elif AHU_Vist.get() or AHU_VistGap.get():
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'set_cntr_on_twt'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        # os.system("start /wait cmd /c speakerEnableAllOn_Visteon.bat")
+
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
 
 
 def CAN_setup0():
@@ -1290,6 +1368,7 @@ def AHU_changeP():
         AHU_Pana.set(True)
         AHU_Clar.set(False)
         AHU_Vist.set(False)
+        AHU_VistGap.set(False)
 
 
 def AHU_changeC():
@@ -1299,6 +1378,7 @@ def AHU_changeC():
         AHU_Pana.set(False)
         AHU_Clar.set(True)
         AHU_Vist.set(False)
+        AHU_VistGap.set(False)
 
 
 def AHU_changeV():
@@ -1308,6 +1388,16 @@ def AHU_changeV():
         AHU_Pana.set(False)
         AHU_Clar.set(False)
         AHU_Vist.set(True)
+        AHU_VistGap.set(False)
+
+def AHU_changeVGap():
+    print("AHU Change")
+    if AHU_Vist.get():
+        print("Visteon Gap")
+        AHU_Pana.set(False)
+        AHU_Clar.set(False)
+        AHU_Vist.set(False)
+        AHU_VistGap.set(True)
 
 
 def Sp1_change():
@@ -1654,7 +1744,7 @@ tpid_off_ttp = CreateToolTip(tpid_off, "Enter ECU ID to disable tester present m
 bass_scale = Scale(root, from_=7, to=-7, showvalue=7, width=10, length=50, sliderlength=20)
 bass_scale.pack()
 bass_scale.place(rely=.17, relx=.275)
-bass_scale.set(7)
+#bass_scale.set(7)
 
 # treb_in = Entry(root, bd=2, width=2)
 # treb_in.pack()
@@ -1664,7 +1754,7 @@ bass_scale.set(7)
 treb_scale = Scale(root, from_=7, to=-7, showvalue=7, width=10, length=50, sliderlength=20)
 treb_scale.pack()
 treb_scale.place(rely=.17, relx=.427)
-treb_scale.set(0)
+#treb_scale.set(0)
 
 
 # create a top level menu
@@ -1703,14 +1793,17 @@ menubar.add_cascade(label='AMP', menu=Amp_menu)
 AHU_Pana = tk.BooleanVar()
 AHU_Clar = tk.BooleanVar()
 AHU_Vist = tk.BooleanVar()
+AHU_VistGap = tk.BooleanVar()
 AHU_Pana.set(True)
 AHU_Clar.set(False)
 AHU_Vist.set(False)
+AHU_VistGap.set(False)
 
 AHU_menu = tk.Menu(menubar, background='white')
 AHU_menu.add_checkbutton(label="Panasonic", onvalue=True, offvalue=False, variable=AHU_Pana, command=AHU_changeP)
 AHU_menu.add_checkbutton(label="Clarion", onvalue=True, offvalue=False, variable=AHU_Clar, command=AHU_changeC)
 AHU_menu.add_checkbutton(label="Visteon", onvalue=True, offvalue=False, variable=AHU_Vist, command=AHU_changeV)
+AHU_menu.add_checkbutton(label="Visteon-GAP", onvalue=True, offvalue=False, variable=AHU_VistGap, command=AHU_changeVGap)
 menubar.add_cascade(label='AHU', menu=AHU_menu)
 
 # add Speaker Setup selection to menu bar
