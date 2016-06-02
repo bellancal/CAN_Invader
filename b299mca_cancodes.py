@@ -206,7 +206,7 @@ def cancodes_init(config_file):
                         "DID": '8003',
                         "parameter": '03',
                         "access": '03',
-                        "data": '30fcffff'} # TODO: try 30e3ffff??
+                        "data": '30e3ffff'} # was  30fcffff
 
     # Enables all speakers  4 bytes for Clarion and Visteon GAP
     set_all_on_4 = {"reqID": '727',
@@ -214,7 +214,7 @@ def cancodes_init(config_file):
                     "DID": '8003',
                     "parameter": '03',
                     "access": '03',
-                    "data": '30fcffff'}
+                    "data": '30e3ffff'} # was  30fcffff
 
     # Enables all speakers  8 bytes for panasonic and visteon
     set_all_on = {"reqID": '727',
@@ -222,7 +222,7 @@ def cancodes_init(config_file):
                   "DID": '8003',
                   "parameter": '03',
                   "access": '03',
-                  "data": '30e3ffffffffffff'} # TODO: try 30e3ffffffffff
+                  "data": '30e3ffffffffffff'} # was  30fcffffffffff
 
     # Enables only the right front speaker
     set_rf_on = {"reqID": '727',
@@ -489,7 +489,7 @@ def cancodes_init(config_file):
                        "speakerEnableRFtwt": set_rf_on_twt,
                        "speakerEnableLF": set_lf_on,
                        "speakerEnableLFtwt": set_lf_on_twt,
-                       "AMPspeakerEnableLFtwt": AMP_set_lf_on_twt_4,
+                       "AMPspeakerEnableLFtwt4": AMP_set_lf_on_twt_4,
                        "speakerEnableRR": set_rr_on,
                        "speakerEnableLR": set_lr_on,
                        "speakerEnableCntr": set_cntr_on,

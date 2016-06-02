@@ -789,13 +789,13 @@ def set_vol19():
     global command_error
 
     if Amp_Present.get():
-        print("AMP Set Vol 13")
+        print("AMP Set Vol 19")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():
-        print("Set Vol GAP 13")
+        print("Set Vol GAP 19")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
-        print("Set Vol 13")
+        print("Set Vol 19")
         # os.system("start /wait cmd /c setVolumeX13.bat")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
@@ -814,7 +814,7 @@ def set_vol16():
     v = format(MasterVol2, '02x')
 
     if Amp_Present.get():
-        print("AMP Set Vol 5" + str(MasterVol2))
+        print("AMP Set Vol" + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():
         print("Set Vol GAP " + str(MasterVol2))
@@ -839,13 +839,13 @@ def set_vol22():
     global command_error
 
     if Amp_Present.get():
-        print("AMP Set Vol 16")
+        print("AMP Set Vol 22")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():
-        print("Set Vol GAP 16")
+        print("Set Vol GAP 22")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
-        print("Set Vol 16")
+        print("Set Vol 22")
         # os.system("start /wait cmd /c setVolumeX13.bat")
         p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
