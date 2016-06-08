@@ -29,6 +29,7 @@ ver2.0 | May 14 2016  major updates:
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
 #TODO: check the speaker control for AMP
+#TODO: implement Visteon GAP volume
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -739,7 +740,7 @@ def set_vol1():
     if Amp_Present.get():
         print("AMP Set Vol " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    elif AHU_VistGap.get():
+    elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
         print("Set Vol GAP " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -762,7 +763,7 @@ def set_vol5():
     if Amp_Present.get():
         print("AMP Set Vol 5")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    elif AHU_VistGap.get():
+    elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
         print("Set Vol GAP 5" )
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -791,7 +792,7 @@ def set_vol19():
     if Amp_Present.get():
         print("AMP Set Vol 19")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    elif AHU_VistGap.get():
+    elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
         print("Set Vol GAP 19")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -816,7 +817,7 @@ def set_vol16():
     if Amp_Present.get():
         print("AMP Set Vol" + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    elif AHU_VistGap.get():
+    elif AHU_VistGap.get():  # setvolfront command uses the vol lookup table to adjust the volume steps
         print("Set Vol GAP " + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -841,7 +842,7 @@ def set_vol22():
     if Amp_Present.get():
         print("AMP Set Vol 22")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-    elif AHU_VistGap.get():
+    elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
         print("Set Vol GAP 22")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -874,7 +875,7 @@ def set_volX():
         if Amp_Present.get():
             print("AMP Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
-        elif AHU_VistGap.get():
+        elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
             print("Set Vol GAP " + v)
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         else:
@@ -1419,7 +1420,7 @@ def AHU_changeV():
 
 def AHU_changeVGap():
     print("AHU Change")
-    if AHU_Vist.get():
+    if AHU_VistGap.get():
         print("Visteon Gap")
         AHU_Pana.set(False)
         AHU_Clar.set(False)

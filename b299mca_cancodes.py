@@ -7,6 +7,24 @@
 #    ECU_ID, command service, DID, parameter, access, data :  727 2F 61A1 03 0A
 #    ECUreqID is blank then the default value on .ini file is used.
 #
+# todo transport mode: Request for DiagnosticSessionControl (Service 0x10)  --  [ECU ID: 0x726 (BCM)]
+#Normal Mode:
+#      Session: 0x03 (extendedDiagnosticSession)  [SPRMIB = False]
+# Positive Response to DiagnosticSessionControl (Service 0x10)  --  [ECU ID: 0x72E (BCM)]
+#      Session: 0x03 (extendedDiagnosticSession)     P2can:  50ms      P2*can: 5000ms
+# Request for WriteDataByIdentifier (Service 0x2E)  --  [ECU ID: 0x726 (BCM)]
+#      DataIdentifier:  0xDE02     Data Size: 1 byte(s)
+#      Data (Hex): 01           Error:  DID Size Mismatch
+# Positive Response to WriteDataByIdentifier (Service 0x2E)  --  [ECU ID: 0x72E (BCM)]
+#      DataIdentifier:  0xDE02
+#Transport Mode:
+# Request for WriteDataByIdentifier (Service 0x2E)  --  [ECU ID: 0x726 (BCM)]
+#      DataIdentifier:  0xDE02     Data Size: 1 byte(s)
+#      Data (Hex): 02           Error:  DID Size Mismatch
+# Positive Response to WriteDataByIdentifier (Service 0x2E)  --  [ECU ID: 0x72E (BCM)]
+#      DataIdentifier:  0xDE02
+
+
 
 import configparser
 
