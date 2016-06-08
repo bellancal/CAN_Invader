@@ -29,7 +29,7 @@ ver2.0 | May 14 2016  major updates:
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
 #TODO: check the speaker control for AMP
-#TODO: implement Visteon GAP volume
+
 
 # Define global variables here
 cfg = configparser.ConfigParser()
