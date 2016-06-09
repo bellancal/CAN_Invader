@@ -29,7 +29,7 @@ ver2.0 | May 14 2016  major updates:
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
 #TODO: check the speaker control for AMP
-
+#TODO: Add volume control for the Klippel callback
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -213,7 +213,7 @@ def AMP_autocheck():
         Amp_Present.set(False)
         default_volume =  cfg['DUT']['VOLUME_FRONT']
 
-    loaded_volume.set('Default Volume Setting = ' + default_volume)
+    # loaded_volume.set('Default Volume Setting = ' + default_volume)
 
 
 def CheckAHU():
@@ -901,11 +901,11 @@ def set_volX():
         command_error = False
 
 
-def set_vol_default(v):
+def set_vol_default(v_dec):
     global command_error
 
     # convert to hex for command as ini file is NOT in hex format!!
-    v = format(int(v), '02x')
+    v = format(int(v_dec), '02x')
     if v != "":
         if Amp_Present.get():
             print("AMP Set Vol Default =" + v)
@@ -925,6 +925,7 @@ def set_vol_default(v):
             return False
         else:
             command_error = False
+            loaded_volume.set('Default Volume Setting = ' + v_dec)
             return True
 
 
@@ -1459,6 +1460,7 @@ def on_closing():
 def listenloop(s):
     # creates thread that monitors for incoming data to the gui port 50001
     # to use run this in command line: python pynetcat.py localhost 50001 data
+    global default_volume
     size = 1024
     while True:
         try:
@@ -1494,6 +1496,18 @@ def listenloop(s):
                        filename = str(filename).replace("'","")  # remove quotes
                        print("Klippel config :" + filename)
                        LoadConfig(filename)
+                    elif data.find("volDown")>0:
+                        default_volume_int = int(default_volume) - 1
+                        default_volume_int = max(0, default_volume_int)
+                        print("Klippel Vol Down = " + str(default_volume_int))
+                        default_volume = str(default_volume_int)
+                        set_vol_default(default_volume)
+                    elif data.find("volUp")>0:
+                        default_volume_int = int(default_volume) + 1
+                        default_volume_int = min(30, default_volume_int)
+                        print("Klippel Vol Up = " + str(default_volume_int))
+                        default_volume = str(default_volume_int)
+                        set_vol_default(default_volume)
 
                 except:
                     print(traceback.format_exc())
