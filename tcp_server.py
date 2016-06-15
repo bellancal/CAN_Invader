@@ -291,8 +291,8 @@ def doCommand(command):
             a = oobd.sendCanData([ncommand["cmd"] + ncommand["DID"] + ncommand["parameter"] + new_data], reqId=ncommand["reqID"], checkAnswer=False)
 
         answer = str(a) + str(b)
-        logging.info("Result--> " + answer)
-        if answer.find("Error") > 0 or answer == "['']['']" or answer == "['']" :
+        logging.info("Result--> " + answer + " a=" + str(a)[2:4] + " b=" + str(b)[2:4])
+        if answer.find("Error") > 0 or answer == "['']['']" or answer == "['']" or str(a)[2:4] == '7f' or str(b)[2:4] == '7f' :
             logging.info("-->!!!Error Sending Last Command!!!")
             client.send(b'Error')
 

@@ -201,13 +201,22 @@ def cancodes_init(config_file):
                      "access": '03',
                      "data": 'fdfdffffffffffff'}
 
-    # Enables left front speaker and left tweeter  4 bytes for Clarion
+    # Enables left front speaker and left tweeter  4 bytes for THX AMP
     AMP_set_lf_on_twt_4 = {"reqID": '783',
                            "cmd": '2f',
                            "DID": '8003',
                            "parameter": '03',
                            "access": '03',
                            "data": 'fdfdffff'}
+
+
+    # Enables left front speaker and left tweeter  8 bytes for SONY AMP
+    AMP_set_lf_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fdfdffffffffffff'}
 
 
     # Enables left front speaker and left tweeter  4 bytes for Clarion
@@ -218,13 +227,21 @@ def cancodes_init(config_file):
                        "access": '03',
                        "data": 'fdfdffff'}
 
-    # Enables all speakers  4 bytes for Clarion
+    # Enables all speakers  4 bytes THX AMP
     AMP_set_all_on_4 = {"reqID": '783',
                         "cmd": '2f',
                         "DID": '8003',
                         "parameter": '03',
                         "access": '03',
                         "data": '30e3ffff'} # was  30fcffff
+
+    # Enables all speakers  8 bytes SONY AMP
+    AMP_set_all_on_8 = {"reqID": '783',
+                        "cmd": '2f',
+                        "DID": '8003',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": '30e3ffffffffffff'} # was  30fcffff
 
     # Enables all speakers  4 bytes for Clarion and Visteon GAP
     set_all_on_4 = {"reqID": '727',
@@ -283,13 +300,22 @@ def cancodes_init(config_file):
                        "access": '03',
                        "data": 'fefeffff'}
 
-    # Enables only the right front speaker 4 bytes for AMP
+    # Enables only the right front speaker 4 bytes for THX AMP
     AMP_set_rf_on_twt_4 = {"reqID": '783',
                            "cmd": '2f',
                            "DID": '8003',
                            "parameter": '03',
                            "access": '03',
                            "data": 'fefeffff'}
+
+    # Enables only the right front speaker 8 bytes for SONY AMP
+    AMP_set_rf_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fefeffffffffffff'}
+
 
     # Enables only the right rear speaker
     set_rr_on = {"reqID": '727',
@@ -307,13 +333,24 @@ def cancodes_init(config_file):
                    "access": '03',
                    "data": 'fbffffff'}
 
-    # Enables only the right rear speaker 4 bytes for AMP with tweeter
+
+    # Enables only the right rear speaker 4 bytes for THX AMP with tweeter
     AMP_set_rr_on_twt_4 = {"reqID": '783',
                            "cmd": '2f',
                            "DID": '8003',
                            "parameter": '03',
                            "access": '03',
                            "data": 'fbfbffff'}
+
+
+    # Enables only the right rear speaker 8 bytes for SONY AMP with tweeter
+    AMP_set_rr_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'fbfbffffffffffff'}
+
 
     # Enables only the left rear speaker
     set_lr_on = {"reqID": '727',
@@ -323,13 +360,21 @@ def cancodes_init(config_file):
                  "access": '03',
                  "data": 'f7 ff ff ff ff ff ff ff'}
 
-    # Enables only the left rear speaker 4 bytes for AMP with tweeter
+    # Enables only the left rear speaker 4 bytes for THX AMP with tweeter
     AMP_set_lr_on_twt_4 = {"reqID": '783',
                            "cmd": '2f',
                            "DID": '8003',
                            "parameter": '03',
                            "access": '03',
                            "data": 'f7f7ffff'}
+
+    # Enables only the left rear speaker 8 bytes for SONY AMP with tweeter
+    AMP_set_lr_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'f7f7ffffffffffff'}
 
 
     # Enables only the left rear speaker    4 bytes for Clarion
@@ -372,13 +417,22 @@ def cancodes_init(config_file):
                      "access": '03',
                      "data": 'bfffffff'}
 
-    #  Enables only the center speaker 4 bytes for AMP
+    #  Enables only the center speaker 4 bytes for THX AMP
     AMP_set_cntr_on_4 = {"reqID": '783',
                      "cmd": '2f',
                      "DID": '8003',
                      "parameter": '03',
                      "access": '03',
                      "data": 'bfffffff'}
+
+
+    #  Enables only the center speaker 8 bytes for Sony AMP
+    AMP_set_cntr_on_8 = {"reqID": '783',
+                     "cmd": '2f',
+                     "DID": '8003',
+                     "parameter": '03',
+                     "access": '03',
+                     "data": 'bfffffffffffffff'}
 
 
     #  Enables only the subwoofer
@@ -397,13 +451,22 @@ def cancodes_init(config_file):
                           "access": '03',
                           "data": '7fffffff'}
 
-    #  Enables only the subwoofer with AMP   4 bytes for Clarion
+    #  Enables only the subwoofer with AMP   4 bytes for THX
     AMP_set_subwoofer_on_4 = {"reqID": '783',
                               "cmd": '2f',
                               "DID": '8003',
                               "parameter": '03',
                               "access": '03',
                               "data": '7fffffff'}
+
+
+    #  Enables only the subwoofer with AMP   8 bytes for Sony
+    AMP_set_subwoofer_on_8 = {"reqID": '783',
+                              "cmd": '2f',
+                              "DID": '8003',
+                              "parameter": '03',
+                              "access": '03',
+                              "data": '7fffffffffffffff'}
 # ============================================================================================================
 # VIN READING ==============================================================================================
 
@@ -516,27 +579,34 @@ def cancodes_init(config_file):
                        "speakerEnableLF": set_lf_on,
                        "speakerEnableLFtwt": set_lf_on_twt,
                        "AMPspeakerEnableLFtwt4": AMP_set_lf_on_twt_4,
+                       "AMPspeakerEnableLFtwt8": AMP_set_lf_on_twt_8,
                        "speakerEnableRR": set_rr_on,
                        "speakerEnableLR": set_lr_on,
                        "speakerEnableCntr": set_cntr_on,
                        "speakerEnableCntrtwt": set_cntr_on_twt,
                        "AMPspeakerEnableCntr": AMP_set_cntr_on_4,
+                       "AMPspeakerEnableCntr8": AMP_set_cntr_on_8,
                        "speakerEnableSub": set_subwoofer_on,
                        "speakerEnableRF4": set_rf_on_4,  # for clarion
                        "speakerEnableRFtwt4": set_rf_on_twt_4,
                        "AMPspeakerEnableRFtwt4": AMP_set_rf_on_twt_4,
+                       "AMPspeakerEnableRFtwt8": AMP_set_rf_on_twt_8,
                        "speakerEnableLF4": set_lf_on_4,
                        "speakerEnableLFtwt4": set_lf_on_twt_4,
                        "speakerEnableRR4": set_rr_on_4,
                        "AMPspeakerEnableRRtwt4": AMP_set_rr_on_twt_4,
+                       "AMPspeakerEnableRRtwt8": AMP_set_rr_on_twt_8,
                        "speakerEnableLR4": set_lr_on_4,
                        "AMPspeakerEnableLRtwt4": AMP_set_lr_on_twt_4,
+                       "AMPspeakerEnableLRtwt8": AMP_set_lr_on_twt_8,
                        "speakerEnableCntr4": set_cntr_on_4,
                        "speakerEnableCntrtwt4": set_cntr_on_twt_4,
                        "speakerEnableSub4": set_subwoofer_on_4,
                        "AMPspeakerEnableSub4": AMP_set_subwoofer_on_4,
+                       "AMPspeakerEnableSub8": AMP_set_subwoofer_on_8,
                        "speakerEnableAllOn4": set_all_on_4,
                        "AMPspeakerEnableAllOn4": AMP_set_all_on_4,
+                       "AMPspeakerEnableAllOn8": AMP_set_all_on_8,
                        "speakerEnableAllOn4Clarion" : set_all_on_4_Clarion,
                        "speakerEnableAllOn": set_all_on,
                        "radioOn": radio_on,  # sends command to MFD

@@ -18,10 +18,10 @@ index = 8
 # NOTE for RCM/PCM/ABS to read back VIN IGNITION MUST BE RUNNING/ON!!!!
 # DO NOT CHANGE ANYTHING BELOW.........................................
 config_list2 = []  # master list of dictionary pairs - filename, displayname
-config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"})  # index = 0 NEED TO TEST STILL!!!! 125K ms, visteon AHU no tweets, ipc/bcm
+config_list2.append({"filename": "oobd_control_C346.ini", "displayname": "C346"})  # index = 0 tested on GeN1.1 June 15 OK 125K ms, visteon AHU with tweets, ipc/bcm | test on Sony GEN3 with AMP
 config_list2.append({"filename": "oobd_control_S550.ini", "displayname": "S550"})  # index = 1 #use ABS for VIN  500k ms, clarion, sp=2
 config_list2.append({"filename": "oobd_control_B299.ini", "displayname": "B299"})  # index = 2 #use apim for VIN this worked in B299N  IPC works too.  hs 500k, visteon, sp=1
-config_list2.append({"filename": "oobd_control_CD390.ini", "displayname": "CD390"})  # index = 3 NEED TO TEST STILL!!!! TODO-test CD390 Fusion vehicle again based on EU issues
+config_list2.append({"filename": "oobd_control_CD390.ini", "displayname": "CD390"})  # index = 3 NEED TO TEST STILL!!!! TODO-test CD390 Fusion vehicle again based on EU issues with AMP
 config_list2.append({"filename": "oobd_control_CD391.ini", "displayname": "CD391"})  # index = 4 ms 500k, Panasonic + tweeters, sub, VIN=rcm + abs
 config_list2.append({"filename": "oobd_control_C520.ini", "displayname": "C520"})  # index = 5 use IPC for VIN on C520N or BCM OK ?, ms 125k, panasonic escape
 config_list2.append({"filename": "oobd_control_CD539.ini", "displayname": "CD539"})  # index = 6 ms 500k, visteon, sp=1 edge

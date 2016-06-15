@@ -28,7 +28,7 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-#TODO: check the speaker control for AMP
+#TODO: check the speaker control for Sony AMP like in Fusion (no THX)
 
 
 # Define global variables here
@@ -173,20 +173,31 @@ def CheckAMP():
     present = 1 | 0
     """
     global default_volume
+    print("Checking for AMP in config file only...")
     if cfg.has_section('AMP'):
-        amptype = cfg['AMP']['PRESENT']
+        amptype = cfg['AMP']['TYPE']
         amptype = amptype.lower()
-        if amptype == '1':
-            Amp_Present.set(True)
-            print("AMP is present")
+        if amptype == '1': # THX
+            Amp_THX_Present.set(True)
+            Amp_SONY_Present.set(False)
+            print("THX AMP is present")
             default_volume = cfg['AMP']['VOLUME']
 
-        elif amptype == '0':
-            Amp_Present.set(False)
+        elif amptype == '2': # SONY
+            Amp_SONY_Present.set(True)
+            Amp_THX_Present.set(False)
+            print("THX AMP is present")
+            default_volume = cfg['AMP']['VOLUME']
+
+        elif amptype == '0': # NO AMP
+            Amp_THX_Present.set(False)
+            Amp_SONY_Present.set(False)
             print("No AMP present")
             default_volume = cfg['DUT']['VOLUME_FRONT']
         else:
             print("Invalid AMP type defined - check config")
+            Amp_THX_Present.set(False)
+            Amp_SONY_Present.set(False)
 
     else:
         print("No AMP type found during autocheck")
@@ -204,14 +215,24 @@ def AMP_autocheck():
     global default_volume
     print("Auto check for AMP")
     # do auto check for AMP
-    Amp_Present.set(True) # sorce to send messsage to AMP
-    if set_vol_default(0):
-        print("AMP FOUND in AutoCHECK!!")
+    Amp_THX_Present.set(True) # source to send messsage to AMP
+    if speaker_All():
+        print("THX AMP FOUND in AutoCHECK!!")
         default_volume =  cfg['AMP']['VOLUME']
+        return
     else:
-        print("NO AMP FOUND in AutoCHECK!!")
-        Amp_Present.set(False)
-        default_volume =  cfg['DUT']['VOLUME_FRONT']
+        Amp_THX_Present.set(False) # source to send messsage to AMP
+        Amp_SONY_Present.set(True) # source to send messsage to AMP
+
+
+    if speaker_All():
+         print("SONY AMP FOUND in AutoCHECK!!")
+         default_volume =  cfg['AMP']['VOLUME']
+    else:
+         print("NO AMP FOUND in AutoCHECK!!")
+         Amp_THX_Present.set(False)
+         Amp_SONY_Present.set(False)
+         default_volume =  cfg['DUT']['VOLUME_FRONT']
 
     # loaded_volume.set('Default Volume Setting = ' + default_volume)
 
@@ -622,6 +643,7 @@ def connect():
         # CheckSpeaker()
         # CheckVIN()
         ReadVIN()
+        AMP_autocheck()
         return True
 
     else:
@@ -659,7 +681,7 @@ def set_bass():
     else:
         b = format(int(b) + 7, '02X')
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set BASS =" + b)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -688,7 +710,7 @@ def set_treble():
         t = format(int(t) + 7,'02X')
 
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Treble =" + t)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
@@ -737,7 +759,7 @@ def set_vol1():
 
     v = format(MasterVol1, '02x')
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Vol " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -760,7 +782,7 @@ def set_vol5():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Vol 5")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -789,7 +811,7 @@ def set_vol19():
         return
     global command_error
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Vol 19")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -814,7 +836,7 @@ def set_vol16():
     global command_error
     v = format(MasterVol2, '02x')
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Vol" + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():  # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -839,7 +861,7 @@ def set_vol22():
         return
     global command_error
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Vol 22")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -872,7 +894,7 @@ def set_volX():
     v = v_scale.get()
     if v != "":
         v = format(int(v), '02x')
-        if Amp_Present.get():
+        if Amp_THX_Present.get() or Amp_SONY_Present.get():
             print("AMP Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -882,7 +904,7 @@ def set_volX():
             print("Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','setVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:  # no data entered so assume default defined in setVolumeX command that is 0
-        if Amp_Present.get():
+        if Amp_THX_Present.get() or Amp_SONY_Present.get():
             print("AMP Set Vol X = 0")
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         elif AHU_VistGap.get():
@@ -907,7 +929,7 @@ def set_vol_default(v_dec):
     # convert to hex for command as ini file is NOT in hex format!!
     v = format(int(v_dec), '02x')
     if v != "":
-        if Amp_Present.get():
+        if Amp_THX_Present.get() or Amp_SONY_Present.get():
             print("AMP Set Vol Default =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         elif AHU_VistGap.get():
@@ -925,7 +947,7 @@ def set_vol_default(v_dec):
             return False
         else:
             command_error = False
-            loaded_volume.set('Default Volume Setting = ' + v_dec)
+            loaded_volume.set('Default Volume Setting = ' + str(v_dec))
             return True
 
 
@@ -1137,8 +1159,12 @@ def speaker_LF():
     print("Speaker LF")
 
     # Check for AMP first
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLFtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
     elif AHU_Clar.get():
             if Speaker1.get(): # no tweeters
@@ -1173,8 +1199,11 @@ def speaker_RF():
     global command_error
     print("Speaker RF")
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRFtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
 
     elif AHU_Clar.get():
@@ -1208,8 +1237,11 @@ def speaker_LR():
     global command_error
     print("Speaker LR")
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableLRtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
 
     elif AHU_Clar.get():
@@ -1240,8 +1272,11 @@ def speaker_RR():
         return
     global command_error
     print("Speaker RR")
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRRtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
 
     elif AHU_Clar.get():
@@ -1272,8 +1307,11 @@ def speaker_All():
         return
     global command_error
     print("Speaker All")
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableAllOn8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
     elif AHU_Clar.get(): # works on P552
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4Clarion'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1288,9 +1326,11 @@ def speaker_All():
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
-        command_error = True
+        return False
+       # command_error = True
     else:
         command_error = False
+        return True
 
 
 def speaker_Center():
@@ -1301,8 +1341,11 @@ def speaker_Center():
     global command_error
     print("Speaker Center")
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableCntr'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableCntr8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     # then check by AHU and speaker type
 
     elif AHU_Clar.get():
@@ -1331,8 +1374,12 @@ def speaker_Sub():
     # os.system("start /wait cmd /c speakerEnableSub_Clarion.bat")
     global command_error
 
-    if Amp_Present.get():
+    if Amp_THX_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableSub4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableSub8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+
     # then check by AHU and speaker type
 
     elif AHU_Clar.get():
@@ -1428,6 +1475,20 @@ def AHU_changeVGap():
         AHU_Vist.set(False)
         AHU_VistGap.set(True)
 
+
+def Amp_SONY_Change():
+    print("AMP Change")
+    if Amp_SONY_Present.get():
+        print("SONY AMP")
+        Amp_THX_Present.set(False)
+        Amp_SONY_Present.set(True)
+
+def Amp_THX_Change():
+    print("AMP Change")
+    if Amp_THX_Present.get():
+        print("THX AMP")
+        Amp_THX_Present.set(True)
+        Amp_SONY_Present.set(False)
 
 def Sp1_change():
     if Speaker1.get():
@@ -1825,11 +1886,14 @@ menubar.add_cascade(label='CAN Setup', menu=cansp_menu)
 # ECU Diagnostic Reception ID	0x0783	CAN ID for physically addressed diagnostic requests.This  parameter is only relevant, if a 11 bit identifier (=> normal addressing) is used.
 # ECU Diagnostic Transmission ID	0x078B	CAN ID for physically addressed diagnostic responses.This  parameter is only relevant, if a 11 bit identifier (=> normal addressing) is used.
 
-Amp_Present = tk.BooleanVar()
-Amp_Present.set(False)
+Amp_THX_Present = tk.BooleanVar()
+Amp_THX_Present.set(False)
+Amp_SONY_Present = tk.BooleanVar()
+Amp_SONY_Present.set(False)
 
 Amp_menu = tk.Menu(menubar, background='white')
-Amp_menu.add_checkbutton(label="Present", onvalue=True, offvalue=False, variable=Amp_Present)
+Amp_menu.add_checkbutton(label="THX AMP", onvalue=True, offvalue=False, variable=Amp_THX_Present, command=Amp_THX_Change)
+Amp_menu.add_checkbutton(label="SONY AMP", onvalue=True, offvalue=False, variable=Amp_SONY_Present, command=Amp_SONY_Change)
 menubar.add_cascade(label='AMP', menu=Amp_menu)
 
 # add AHU selection to menu bar
@@ -1875,7 +1939,7 @@ info_l2.place(relx=0, rely=.05)
 # Check Connection Status in periodic update loop
 def task():
     global e_popup, servercmd
-    ConfigFile.User_AMP_Selection = Amp_Present.get()
+    ConfigFile.User_AMP_Selection = Amp_THX_Present.get()
     # print("AMP present = " + str(User_AMP_Selection))
     print("User Connect = " + str(User_Connect))
     # print("OOBD Connect = " + str(OOBDControl.ConnectTest))
