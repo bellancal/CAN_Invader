@@ -29,7 +29,7 @@ ver2.0 | May 14 2016  major updates:
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
 #TODO: check the speaker control for AMP
-#TODO: Add volume control for the Klippel callback
+
 
 # Define global variables here
 cfg = configparser.ConfigParser()
@@ -1275,8 +1275,8 @@ def speaker_All():
     if Amp_Present.get():
          p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     # then check by AHU and speaker type
-    elif AHU_Clar.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif AHU_Clar.get(): # works on P552
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4Clarion'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
     elif AHU_Pana.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1728,6 +1728,7 @@ info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
 info_l1.place(relx=0)
 default_volume = 0
+
 # global positioning variables to make life easier
 speaker_y = .47
 speaker_x = .07
@@ -1769,7 +1770,7 @@ fin.pack()
 fin.place(rely=.13, relx=.8)
 fin_ttp = CreateToolTip(fin, "Enter valid FM freq from 87.50 to 108.00")
 
-v_scale = Scale(root, from_=0, to=30)
+v_scale = Scale(root, from_=30, to=0)
 v_scale.pack()
 v_scale.place(rely=speaker_y - .12, relx=.935)
 
@@ -1873,7 +1874,7 @@ info_l2.place(relx=0, rely=.05)
 
 # Check Connection Status in periodic update loop
 def task():
-    global e_popup
+    global e_popup, servercmd
     ConfigFile.User_AMP_Selection = Amp_Present.get()
     # print("AMP present = " + str(User_AMP_Selection))
     print("User Connect = " + str(User_Connect))

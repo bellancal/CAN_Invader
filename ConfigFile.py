@@ -34,5 +34,3 @@ config_list2.append({"filename": "test.ini", "displayname": "test only"})  # ind
 config_file_default = config_list2[index]["filename"]  # use index above in place of the number [x]
 
 # END OF FILE END OF FILE END OF FILE END OF FILE END OF FILE END OF FILE
-
-

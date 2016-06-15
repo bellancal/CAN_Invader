@@ -234,6 +234,14 @@ def cancodes_init(config_file):
                     "access": '03',
                     "data": '30e3ffff'} # was  30fcffff
 
+     # Enables all speakers  4 bytes for Clarion IN P552 with 2 front speakers only
+    set_all_on_4_Clarion = {"reqID": '727',
+                    "cmd": '2f',
+                    "DID": '8003',
+                    "parameter": '03',
+                    "access": '03',
+                    "data": '30fcffff'}
+
     # Enables all speakers  8 bytes for panasonic and visteon
     set_all_on = {"reqID": '727',
                   "cmd": '2f',
@@ -529,6 +537,7 @@ def cancodes_init(config_file):
                        "AMPspeakerEnableSub4": AMP_set_subwoofer_on_4,
                        "speakerEnableAllOn4": set_all_on_4,
                        "AMPspeakerEnableAllOn4": AMP_set_all_on_4,
+                       "speakerEnableAllOn4Clarion" : set_all_on_4_Clarion,
                        "speakerEnableAllOn": set_all_on,
                        "radioOn": radio_on,  # sends command to MFD
                        "radioOnSYNC": radio_on_sync,  # sends command to MFD
