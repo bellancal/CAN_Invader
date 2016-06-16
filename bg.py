@@ -28,7 +28,7 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-#TODO: check the speaker control for Sony AMP like in Fusion (no THX)
+
 
 
 # Define global variables here
@@ -70,6 +70,8 @@ def LoadConfig(filetoload):
         CheckVIN()
         CheckBassTreb()
         CheckCAN(bus_type=cfg['CAN']['busType'].lower(), speed=cfg['CAN']['speed'].lower())
+        #  Note if already connected and CAN changes then settings will not take effect since a disconnect is needed.
+
         # if the config file does not have the section 'SIZE', then add it to the config-file
         if not cfg.has_section('SIZE'):
             cfg.add_section('SIZE')
@@ -121,18 +123,31 @@ def CheckBassTreb():
 
 def CheckCAN(bus_type=None, speed=None):
     # set gui to match default setting
-        print("bus=" + bus_type + " speed=" + speed)
+        global CONNECTED_BUS_SPEED, CONNECTED_BUS_TYPE, User_Connect
+        print("bus=" + bus_type + " speed=" + speed, " connected type=" + CONNECTED_BUS_TYPE)
+        if User_Connect and (CONNECTED_BUS_SPEED != "None" and CONNECTED_BUS_SPEED != speed) or (CONNECTED_BUS_TYPE != "None" and CONNECTED_BUS_TYPE != bus_type):
+              tkinter.messagebox.showinfo("CAN Config Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
+              return
+
         if bus_type == 'hs' and speed == '500':
             sp_500_HS.set(True)
+            CONNECTED_BUS_SPEED = speed
+            CONNECTED_BUS_TYPE = bus_type
             CAN_setup0()
         elif bus_type == 'hs' and speed == '125':
             sp_125_HS.set(True)
+            CONNECTED_BUS_SPEED = speed
+            CONNECTED_BUS_TYPE = bus_type
             CAN_setup1()
         elif bus_type == 'ms' and speed == '125':
             sp_125_MS.set(True)
+            CONNECTED_BUS_SPEED = speed
+            CONNECTED_BUS_TYPE = bus_type
             CAN_setup3()
         elif bus_type == 'ms' and speed == '500':
             sp_500_MS.set(True)
+            CONNECTED_BUS_SPEED = speed
+            CONNECTED_BUS_TYPE = bus_type
             CAN_setup2()
         else:
             print("Invalid CAN settings in ini file!")
@@ -216,7 +231,7 @@ def AMP_autocheck():
     print("Auto check for AMP")
     # do auto check for AMP
     Amp_THX_Present.set(True) # source to send messsage to AMP
-    if speaker_All():
+    if speaker_All(False):
         print("THX AMP FOUND in AutoCHECK!!")
         default_volume =  cfg['AMP']['VOLUME']
         return
@@ -225,7 +240,7 @@ def AMP_autocheck():
         Amp_SONY_Present.set(True) # source to send messsage to AMP
 
 
-    if speaker_All():
+    if speaker_All(False):
          print("SONY AMP FOUND in AutoCHECK!!")
          default_volume =  cfg['AMP']['VOLUME']
     else:
@@ -648,7 +663,7 @@ def connect():
     else:
         User_Connect = False
         print("Failed to connect via BT!")
-        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure BlueTooth dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle diagnostic port." )
+        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure BlueTooth dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle diagnostic port.  Try unplugging and reconnecting CAN INVADER to vehicle." )
         return False
 
 
@@ -1130,7 +1145,7 @@ def get_VIN_IPC():
 
 
 def disconnect():
-    global User_Connect
+    global User_Connect, CONNECTED_BUS_TYPE, CONNECTED_BUS_SPEED
     global command_error, servercmd
     print("BT Disconnect")
     os.system("start /wait cmd /c bt_disconnect.bat")
@@ -1141,6 +1156,8 @@ def disconnect():
     info_l4.delete(1.0, END)
     info_l4.insert(1.0, "VIN = <no connection>")
     info_l4.config(state=DISABLED)
+    CONNECTED_BUS_SPEED = "None"
+    CONNECTED_BUS_TYPE = "None"
 
     try:
         servercmd.kill()
@@ -1300,7 +1317,7 @@ def speaker_RR():
         command_error = False
 
 
-def speaker_All():
+def speaker_All(check=True):  # check used to supress waring when used as AMP Detector
     if not User_Connect:
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
@@ -1325,8 +1342,10 @@ def speaker_All():
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
         print("Error sending last command!")
+
+        if check:
+            command_error = True
         return False
-       # command_error = True
     else:
         command_error = False
         return True
@@ -1621,6 +1640,7 @@ class App:
         self.radioOn_b = Button(master, text="Radio On", command=radio_on, fg="white", bg="purple")
         self.radioOn_b.pack()
         self.radioOn_b.place(rely=.12, relx=.4)
+        setradioOn__ttp = CreateToolTip(self.radioOn_b, "Enables audio system and sets mode to FM.")
 
         self.setBass_b = Button(master, text="Set Bass", command=set_bass, fg="blue", bg="yellow")
         self.setBass_b.pack()
@@ -1779,6 +1799,8 @@ class CreateToolTip(object):
 # create global variable for the configuration file
 User_Connect = False
 root = Tk()
+CONNECTED_BUS_TYPE = "None"
+CONNECTED_BUS_SPEED = "None"
 loaded_config = StringVar()
 loaded_config.set('Config file not loaded!!')
 e_popup = False
@@ -1788,7 +1810,7 @@ info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
 info_l1.place(relx=0)
 default_volume = 0
-#servercmd
+
 # global positioning variables to make life easier
 speaker_y = .47
 speaker_x = .07
@@ -1950,7 +1972,7 @@ def task():
     if command_error:
         root.configure(background='red')
         if not e_popup:
-              tkinter.messagebox.showinfo("CAN Error", "No response from last message request!")
+              tkinter.messagebox.showinfo("CAN Error", "No response, Late response or Negative response (7F) from last message request!")
         e_popup = True # show only 1 popup - no need to over do it!
     else:
         root.configure(background=ocolor)
