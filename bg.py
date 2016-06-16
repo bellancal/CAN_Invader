@@ -515,6 +515,7 @@ def show_instructions():
 
 
 def start_server():
+    global command_error, servercmd
     # see if already connected
     if User_Connect:
         print("server already connected")
@@ -532,17 +533,15 @@ def start_server():
         print("server status run check failed (means not running yet).")
 
 
-
-    global command_error,  command_error
     command_error = False
 
     print("starting server")
-    global servercmd
+    # global servercmd
     servercmd = subprocess.Popen([sys.executable, "tcp_server.py", "--CONFIG", config_file], creationflags=CREATE_NEW_CONSOLE)
 
 
 def onepress():
-    global command_error, default_volume
+    global command_error, default_volume, servercmd
     if User_Connect:
         print("already connected")
         tkinter.messagebox.showinfo("Server Running", "Server already started and connected!")
@@ -1789,7 +1788,7 @@ info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
 info_l1.place(relx=0)
 default_volume = 0
-
+#servercmd
 # global positioning variables to make life easier
 speaker_y = .47
 speaker_x = .07
