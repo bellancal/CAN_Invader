@@ -518,7 +518,7 @@ def a_key(event):
 
 
 def about():
-    tkinter.messagebox.showinfo("CAN Invader BT Controller", "Ver 2.0 - May 14, 2016 \r\n Ford Motor Company \r\n Contact:LbeLLan1@Ford.com\r\n")
+    tkinter.messagebox.showinfo("CAN Invader BT Controller", "Ver 3.0 - June 17, 2016 \r\n Ford Motor Company \r\n Contact:LbeLLan1@Ford.com\r\n")
     print("width =" + str(root.winfo_width()))
     print("height =" + str(root.winfo_height()))
     # print (root.winfo_geometry())
