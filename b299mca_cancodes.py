@@ -7,7 +7,7 @@
 #    ECU_ID, command service, DID, parameter, access, data :  727 2F 61A1 03 0A
 #    ECUreqID is blank then the default value on .ini file is used.
 #
-# todo transport mode: Request for DiagnosticSessionControl (Service 0x10)  --  [ECU ID: 0x726 (BCM)]
+#  info for transport and normal modes - this is for reference only and is not implemented by design
 #Normal Mode:
 #      Session: 0x03 (extendedDiagnosticSession)  [SPRMIB = False]
 # Positive Response to DiagnosticSessionControl (Service 0x10)  --  [ECU ID: 0x72E (BCM)]
@@ -227,6 +227,102 @@ def cancodes_init(config_file):
                        "access": '03',
                        "data": 'fdfdffff'}
 
+# end FRONT + LEFT FRONT + LEFT FRONT + LEFT FRONT + LEFT FRONT + LEFT FRONT + LEFT FRONT + LEFT FRONT + LEFT
+
+    # Enables only the left front and right front and center speaker
+    set_front_on = {"reqID": '727',
+                 "cmd": '2f',
+                 "DID": '8003',
+                 "parameter": '03',
+                 "access": '03',
+                 "data": 'bc ef ff ff ff ff ff ff'}
+
+    # Enables only the left front speaker  for Clarion AHU uses 4 bytes only and visteon GAP
+    set_front_on_4 = {"reqID": '727',
+                   "cmd": '2f',
+                   "DID": '8003',
+                   "parameter": '03',
+                   "access": '03',
+                   "data": 'bcefffff'}
+
+
+    set_front_on_twt = {"reqID": '727',
+                     "cmd": '2f',
+                     "DID": '8003',
+                     "parameter": '03',
+                     "access": '03',
+                     "data": 'bcecffffffffffff'}
+
+
+    set_front_on_twt_4 = {"reqID": '727',
+                       "cmd": '2f',
+                       "DID": '8003',
+                       "parameter": '03',
+                       "access": '03',
+                       "data": 'bcecffff'}
+
+    AMP_set_front_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'bcecffff'}
+
+    AMP_set_front_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'bcecffffffffffff'}
+
+
+    # Enables only the left front and right front and center speaker
+    set_rear_on = {"reqID": '727',
+                 "cmd": '2f',
+                 "DID": '8003',
+                 "parameter": '03',
+                 "access": '03',
+                 "data": 'f3 ff ff ff ff ff ff ff'}
+
+    # Enables only the left front speaker  for Clarion AHU uses 4 bytes only and visteon GAP
+    set_rear_on_4 = {"reqID": '727',
+                   "cmd": '2f',
+                   "DID": '8003',
+                   "parameter": '03',
+                   "access": '03',
+                   "data": 'f3ffffff'}
+
+
+    set_rear_on_twt = {"reqID": '727',
+                     "cmd": '2f',
+                     "DID": '8003',
+                     "parameter": '03',
+                     "access": '03',
+                     "data": 'f3f3ffffffffffff'}
+
+
+    set_rear_on_twt_4 = {"reqID": '727',
+                       "cmd": '2f',
+                       "DID": '8003',
+                       "parameter": '03',
+                       "access": '03',
+                       "data": 'f3f3ffff'}
+
+    AMP_set_rear_on_twt_4 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'f3f3ffff'}
+
+    AMP_set_rear_on_twt_8 = {"reqID": '783',
+                           "cmd": '2f',
+                           "DID": '8003',
+                           "parameter": '03',
+                           "access": '03',
+                           "data": 'f3f3ffffffffffff'}
+
+
     # Enables all speakers  4 bytes THX AMP
     AMP_set_all_on_4 = {"reqID": '783',
                         "cmd": '2f',
@@ -267,6 +363,8 @@ def cancodes_init(config_file):
                   "access": '03',
                   "data": '30e3ffffffffffff'} # was  30fcffffffffff
 
+# FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT
+
     # Enables only the right front speaker
     set_rf_on = {"reqID": '727',
                  "cmd": '2f',
@@ -274,7 +372,6 @@ def cancodes_init(config_file):
                  "parameter": '03',
                  "access": '03',
                  "data": 'fe ff ff ff ff ff ff ff'}
-
 
     # Enables only the right front speaker 4 bytes for Clarion and Visteon GAP
     set_rf_on_4 = {"reqID": '727',
@@ -315,6 +412,7 @@ def cancodes_init(config_file):
                            "parameter": '03',
                            "access": '03',
                            "data": 'fefeffffffffffff'}
+# END FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT FRONT RIGHT
 
 
     # Enables only the right rear speaker
@@ -577,9 +675,17 @@ def cancodes_init(config_file):
                        "speakerEnableRF": set_rf_on,
                        "speakerEnableRFtwt": set_rf_on_twt,
                        "speakerEnableLF": set_lf_on,
+                       "speakerEnableF": set_front_on,
+                       "speakerEnableR": set_rear_on,
                        "speakerEnableLFtwt": set_lf_on_twt,
+                       "speakerEnableFtwt": set_front_on_twt,
+                       "speakerEnableRtwt": set_rear_on_twt,
                        "AMPspeakerEnableLFtwt4": AMP_set_lf_on_twt_4,
                        "AMPspeakerEnableLFtwt8": AMP_set_lf_on_twt_8,
+                       "AMPspeakerEnableFtwt4": AMP_set_front_on_twt_4,
+                       "AMPspeakerEnableFtwt8": AMP_set_front_on_twt_8,
+                       "AMPspeakerEnableRtwt4": AMP_set_rear_on_twt_4,
+                       "AMPspeakerEnableRtwt8": AMP_set_rear_on_twt_8,
                        "speakerEnableRR": set_rr_on,
                        "speakerEnableLR": set_lr_on,
                        "speakerEnableCntr": set_cntr_on,
@@ -593,6 +699,10 @@ def cancodes_init(config_file):
                        "AMPspeakerEnableRFtwt8": AMP_set_rf_on_twt_8,
                        "speakerEnableLF4": set_lf_on_4,
                        "speakerEnableLFtwt4": set_lf_on_twt_4,
+                       "speakerEnableF4": set_front_on_4,
+                       "speakerEnableFtwt4": set_front_on_twt_4,
+                       "speakerEnableR4": set_rear_on_4,
+                       "speakerEnableRtwt4": set_rear_on_twt_4,
                        "speakerEnableRR4": set_rr_on_4,
                        "AMPspeakerEnableRRtwt4": AMP_set_rr_on_twt_4,
                        "AMPspeakerEnableRRtwt8": AMP_set_rr_on_twt_8,

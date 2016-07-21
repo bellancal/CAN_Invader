@@ -28,6 +28,8 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
+#TODO: add button for front and rear speakers and functions
+
 
 
 
@@ -125,7 +127,7 @@ def CheckCAN(bus_type=None, speed=None):
     # set gui to match default setting
         global CONNECTED_BUS_SPEED, CONNECTED_BUS_TYPE, User_Connect
         print("bus=" + bus_type + " speed=" + speed, " connected type=" + CONNECTED_BUS_TYPE)
-        if User_Connect and (CONNECTED_BUS_SPEED != "None" and CONNECTED_BUS_SPEED != speed) or (CONNECTED_BUS_TYPE != "None" and CONNECTED_BUS_TYPE != bus_type):
+        if User_Connect and ((CONNECTED_BUS_SPEED != "None" and CONNECTED_BUS_SPEED != speed) or (CONNECTED_BUS_TYPE != "None" and CONNECTED_BUS_TYPE != bus_type)):
               tkinter.messagebox.showinfo("CAN Config Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
               return
 
@@ -187,7 +189,7 @@ def CheckAMP():
     [AMP]
     present = 1 | 0
     """
-    global default_volume
+    global default_volume_front, default_volume_rear
     print("Checking for AMP in config file only...")
     if cfg.has_section('AMP'):
         amptype = cfg['AMP']['TYPE']
@@ -196,19 +198,24 @@ def CheckAMP():
             Amp_THX_Present.set(True)
             Amp_SONY_Present.set(False)
             print("THX AMP is present")
-            default_volume = cfg['AMP']['VOLUME']
+            default_volume_front= cfg['AMP']['VOLUME_FRONT']
+            default_volume_rear = cfg['AMP']['VOLUME_REAR']
 
         elif amptype == '2': # SONY
             Amp_SONY_Present.set(True)
             Amp_THX_Present.set(False)
             print("THX AMP is present")
-            default_volume = cfg['AMP']['VOLUME']
+            default_volume_front= cfg['AMP']['VOLUME_FRONT']
+            default_volume_rear = cfg['AMP']['VOLUME_REAR']
+
 
         elif amptype == '0': # NO AMP
             Amp_THX_Present.set(False)
             Amp_SONY_Present.set(False)
             print("No AMP present")
-            default_volume = cfg['DUT']['VOLUME_FRONT']
+            default_volume_front= cfg['DUT']['VOLUME_FRONT']
+            default_volume_rear = cfg['DUT']['VOLUME_REAR']
+
         else:
             print("Invalid AMP type defined - check config")
             Amp_THX_Present.set(False)
@@ -216,9 +223,13 @@ def CheckAMP():
 
     else:
         print("No AMP type found during autocheck")
-        default_volume = cfg['DUT']['VOLUME_FRONT']
+        default_volume_front= cfg['DUT']['VOLUME_FRONT']
+        default_volume_rear = cfg['DUT']['VOLUME_REAR']
 
-    loaded_volume.set('Default Volume Setting = ' + default_volume)
+    loaded_volume.set('Default Front Volume Setting = ' + default_volume_front)
+    loaded_Rvolume.set('Default Rear Volume Setting = ' + default_volume_rear)
+    print('Default Front Volume Setting = ' + default_volume_front)
+    print('Default Rear Volume Setting = ' + default_volume_rear)
 
 
 def AMP_autocheck():
@@ -227,29 +238,31 @@ def AMP_autocheck():
     config.ini file.
     """
 
-    global default_volume
+    global default_volume_front, default_volume_rear
     print("Auto check for AMP")
     # do auto check for AMP
     Amp_THX_Present.set(True) # source to send messsage to AMP
     if speaker_All(False):
         print("THX AMP FOUND in AutoCHECK!!")
-        default_volume =  cfg['AMP']['VOLUME']
+        default_volume_front =  cfg['AMP']['VOLUME_FRONT']
+        default_volume_rear = cfg['AMP']['VOLUME_REAR']
         return
     else:
         Amp_THX_Present.set(False) # source to send messsage to AMP
         Amp_SONY_Present.set(True) # source to send messsage to AMP
 
-
     if speaker_All(False):
-         print("SONY AMP FOUND in AutoCHECK!!")
-         default_volume =  cfg['AMP']['VOLUME']
+        print("SONY AMP FOUND in AutoCHECK!!")
+        default_volume_front =  cfg['AMP']['VOLUME_FRONT']
+        default_volume_rear = cfg['AMP']['VOLUME_REAR']
     else:
-         print("NO AMP FOUND in AutoCHECK!!")
-         Amp_THX_Present.set(False)
-         Amp_SONY_Present.set(False)
-         default_volume =  cfg['DUT']['VOLUME_FRONT']
+        print("NO AMP FOUND in AutoCHECK!!")
+        Amp_THX_Present.set(False)
+        Amp_SONY_Present.set(False)
+        default_volume_front=  cfg['DUT']['VOLUME_FRONT']
+        default_volume_rear = cfg['DUT']['VOLUME_REAR']
 
-    # loaded_volume.set('Default Volume Setting = ' + default_volume)
+    # loaded_volume.set('Default Volume Setting = ' + default_volume_front)
 
 
 def CheckAHU():
@@ -426,15 +439,15 @@ def Hide(action):
         app.radioOn_b.pack(in_=app.frame)
         app.radioOn_b.place(rely=.12, relx=.4)
         app.Testerp_b.pack(in_=app.frame)
-        app.Testerp_b.place(rely=.75, relx=.86)
+        app.Testerp_b.place(rely=.95, relx=0)
         app.TesterpOff_b.pack(in_=app.frame)
-        app.TesterpOff_b.place(rely=.84, relx=.86)
+        app.TesterpOff_b.place(rely=.9, relx=0)
         app.Test_b.pack(in_=app.frame)
-        app.Test_b.place(rely=.9, relx=0)
+        app.Test_b.place(rely=.9, relx=.2)
         tpid.pack(in_=app.frame)
-        tpid.place(rely=.76, relx=.82)
+        tpid.place(rely=.96, relx=.1)
         tpid_off.pack(in_=app.frame)
-        tpid_off.place(rely=.85, relx=.82)
+        tpid_off.place(rely=.91, relx=.1)
 
         app.getVINahu_b.pack()
         app.getVINahu_b.place(rely=vin_y, relx=vin_x)
@@ -556,7 +569,7 @@ def start_server():
 
 
 def onepress():
-    global command_error, default_volume, servercmd
+    global command_error, default_volume_front, servercmd
     if User_Connect:
         print("already connected")
         tkinter.messagebox.showinfo("Server Running", "Server already started and connected!")
@@ -586,7 +599,7 @@ def onepress():
         set_bass()
         set_treble()
         set_freq()
-        set_vol_default(default_volume)
+        set_vol_default(default_volume_front)
         ReadVIN()
     else:
         # close active server
@@ -961,7 +974,7 @@ def set_vol_default(v_dec):
             return False
         else:
             command_error = False
-            loaded_volume.set('Default Volume Setting = ' + str(v_dec))
+            loaded_volume.set('Default Front Volume Setting = ' + str(v_dec))
             return True
 
 
@@ -1418,6 +1431,83 @@ def speaker_Sub():
         command_error = False
 
 
+def speaker_FrontOnly():
+    if not User_Connect:
+        tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
+        return
+    global command_error
+    print("Speaker Front Only")
+
+    if Amp_THX_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableFtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
+        if Speaker1.get():
+            print("AHU=Clar, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif AHU_Pana.get():
+
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif AHU_Vist.get() or AHU_VistGap.get():
+        if Speaker1.get():
+            print("AHU=Visteon, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableF'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
+
+
+def speaker_RearOnly():
+    if not User_Connect:
+        tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
+        return
+    global command_error
+    print("Speaker Front Only")
+
+    if Amp_THX_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif Amp_SONY_Present.get():
+         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPspeakerEnableRtwt8'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    # then check by AHU and speaker type
+
+    elif AHU_Clar.get():
+        if Speaker1.get():
+            print("AHU=Clar, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif AHU_Pana.get():
+
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+    elif AHU_Vist.get() or AHU_VistGap.get():
+        if Speaker1.get():
+            print("AHU=Visteon, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableR'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
+    stdout, stderr = p.communicate()
+    if stdout.find(b'Error') > 0:
+        print("Error sending last command!")
+        command_error = True
+    else:
+        command_error = False
+
+
+
 def CAN_setup0():
     if sp_500_HS.get:
         sp_125_HS.set(False)
@@ -1539,7 +1629,7 @@ def on_closing():
 def listenloop(s):
     # creates thread that monitors for incoming data to the gui port 50001
     # to use run this in command line: python pynetcat.py localhost 50001 data
-    global default_volume
+    global default_volume_front
     size = 1024
     while True:
         try:
@@ -1575,18 +1665,18 @@ def listenloop(s):
                        filename = str(filename).replace("'","")  # remove quotes
                        print("Klippel config :" + filename)
                        LoadConfig(filename)
-                    elif data.find("volDown")>0:
-                        default_volume_int = int(default_volume) - 1
+                    elif data.find("volDownF")>0:
+                        default_volume_int = int(default_volume_front) - 1
                         default_volume_int = max(0, default_volume_int)
-                        print("Klippel Vol Down = " + str(default_volume_int))
-                        default_volume = str(default_volume_int)
-                        set_vol_default(default_volume)
-                    elif data.find("volUp")>0:
-                        default_volume_int = int(default_volume) + 1
+                        print("Klippel Vol Down Front = " + str(default_volume_int))
+                        default_volume_front= str(default_volume_int)
+                        set_vol_default(default_volume_front)
+                    elif data.find("volUpF")>0:
+                        default_volume_int = int(default_volume_front) + 1
                         default_volume_int = min(30, default_volume_int)
-                        print("Klippel Vol Up = " + str(default_volume_int))
-                        default_volume = str(default_volume_int)
-                        set_vol_default(default_volume)
+                        print("Klippel Vol Up Front  = " + str(default_volume_int))
+                        default_volume_front= str(default_volume_int)
+                        set_vol_default(default_volume_front)
 
                 except:
                     print(traceback.format_exc())
@@ -1722,22 +1812,32 @@ class App:
 
         self.speakerCenter_b = Button(master, text="Speaker Center", command=speaker_Center, fg="white", bg="black", height=2, width=12, font=font1)
         self.speakerCenter_b.pack()
-        self.speakerCenter_b.place(rely=speaker_y + .12, relx=speaker_x + .24)
+        self.speakerCenter_b.place(rely=speaker_y + .12, relx=speaker_x + .2)
         speakerCenter_b_ttp = CreateToolTip(self.speakerCenter_b, "Enable Center Speaker only")
 
         self.speakerRF_b = Button(master, text="Speaker RF", command=speaker_RF, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerRF_b.pack()
-        self.speakerRF_b.place(rely=speaker_y + .12, relx=speaker_x + .52)
+        self.speakerRF_b.place(rely=speaker_y + .12, relx=speaker_x + .43)
         speakerRF_b_ttp = CreateToolTip(self.speakerRF_b, "Enable RIGHT FRONT speaker only")
+
+        self.speakerF_b = Button(master, text="Spk. Front", command=speaker_FrontOnly, fg="white", bg="gray", height=2, width=10, font=font1)
+        self.speakerF_b.pack()
+        self.speakerF_b.place(rely=speaker_y + .12, relx=speaker_x + .63)
+        speakerF_b_ttp = CreateToolTip(self.speakerF_b, "Enable ALL FRONT speakers only")
 
         self.speakerRR_b = Button(master, text="Speaker RR", command=speaker_RR, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerRR_b.pack()
-        self.speakerRR_b.place(rely=speaker_y + .28, relx=speaker_x + .52)
+        self.speakerRR_b.place(rely=speaker_y + .28, relx=speaker_x + .43)
         speakerRR_b_ttp = CreateToolTip(self.speakerRR_b, "Enable RIGHT REAR speaker only")
+
+        self.speakerR_b = Button(master, text="Spk. Rear", command=speaker_RearOnly, fg="white", bg="gray", height=2, width=10, font=font1)
+        self.speakerR_b.pack()
+        self.speakerR_b.place(rely=speaker_y + .28, relx=speaker_x + .63)
+        speakerR_b_ttp = CreateToolTip(self.speakerR_b, "Enable ALL REAR speakers only")
 
         self.speakerSub_b = Button(master, text="Speaker Sub", command=speaker_Sub, fg="white", bg="black", height=2, width=10, font=font1)
         self.speakerSub_b.pack()
-        self.speakerSub_b.place(rely=speaker_y + .28, relx=speaker_x + .255)
+        self.speakerSub_b.place(rely=speaker_y + .28, relx=speaker_x + .2)
         speakerSub_b_ttp = CreateToolTip(self.speakerSub_b, "Enable Subwoofer only")
 
         self.speakerLR_b = Button(master, text="Speaker LR", command=speaker_LR, fg="white", bg="black", height=2, width=10, font=font1)
@@ -1745,14 +1845,14 @@ class App:
         self.speakerLR_b.place(rely=speaker_y + .28, relx=speaker_x)
         speakerLR_b_ttp = CreateToolTip(self.speakerLR_b, "Enable LEFT REAR speaker only")
 
-        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black", height=2, width=10, font=font1)
+        self.speakerAll_b = Button(master, text="Speaker ALL", command=speaker_All, fg="white", bg="black", height=6, width=7, font=font1, wraplength=80)
         self.speakerAll_b.pack()
-        self.speakerAll_b.place(rely=speaker_y + .12, relx=speaker_x + .72)
+        self.speakerAll_b.place(rely=speaker_y + .12, relx=speaker_x + .82)
         speakerAll_b_ttp = CreateToolTip(self.speakerAll_b, "Turn all speakers on to original setting")
 
         self.Testerp_b = Button(master, text="TesterP On", command=testerPon, fg="blue", bg="pink")
         self.Testerp_b.pack()
-        self.Testerp_b.place(rely=.71, relx=.85)
+        self.Testerp_b.place(rely=1, relx=0)
 
         self.TesterpOff_b = Button(master, text="TesterP Off", command=testerPoff, fg="blue", bg="pink")
         self.TesterpOff_b.pack()
@@ -1809,27 +1909,35 @@ ocolor = root.cget('bg')
 info_l1 = Label(root, textvariable=loaded_config, font ="12")
 info_l1.pack(side=TOP)
 info_l1.place(relx=0)
-default_volume = 0
+default_volume_front = 0
+default_volume_rear = 0
 
 # global positioning variables to make life easier
 speaker_y = .47
-speaker_x = .07
+speaker_x = 0
 volume_y = .42
 vin_y = .27
 vin_x = .16
 
-# volume label
+# FRONT volume label
 loaded_volume = StringVar()
-loaded_volume.set('Volume Setting = tbd')
+loaded_volume.set('Front Volume Setting = tbd')
 info_l3 = Label(root, textvariable=loaded_volume, font="12")
 info_l3.pack(side=TOP)
 info_l3.place(relx=.65)
 
+# REAR volume label
+loaded_Rvolume = StringVar()
+loaded_Rvolume.set('Rear Volume Setting = tbd')
+info_l13 = Label(root, textvariable=loaded_Rvolume, font="12")
+info_l13.pack()
+info_l13.place(rely=.05, relx=.65)
+
 # VIN label
 info_l4 = Text(root, height=1)
-info_l4.insert(1.0,'VIN = <no connection>' )
+info_l4.insert(1.0,'VIN = <no connection>')
 info_l4.pack()
-info_l4.place(relx=.65, rely=.05)
+info_l4.place(relx=.65, rely=.94)
 info_l4.configure(bg=root.cget('bg'), relief=FLAT, font="12")
 
 # Freq label
