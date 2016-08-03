@@ -28,7 +28,8 @@ ver2.0 | May 14 2016  major updates:
 
 #TODO:determine supplier of AHU from CAN bus.
 #TODO: get input from buld sheet to decode configuration
-#TODO: add button for front and rear speakers and functions
+#TODO: debug GAP radio vol
+#TODO:If connect is pressed with no server?
 
 
 
@@ -262,6 +263,10 @@ def AMP_autocheck():
         default_volume_front=  cfg['DUT']['VOLUME_FRONT']
         default_volume_rear = cfg['DUT']['VOLUME_REAR']
 
+    loaded_volume.set('Default Front Volume Setting = ' + default_volume_front)
+    loaded_Rvolume.set('Default Rear Volume Setting = ' + default_volume_rear)
+    print('Default Front Volume Setting = ' + default_volume_front)
+    print('Default Rear Volume Setting = ' + default_volume_rear)
     # loaded_volume.set('Default Volume Setting = ' + default_volume_front)
 
 
@@ -639,6 +644,19 @@ def connect():
     command_error = False
     print("BT connect")
 
+     # see if server already running but not connected
+    try:
+        server_status = servercmd.poll()
+        print ("Check server status = " + str(server_status) + "(None = running)")
+        if server_status is None:
+            print( "Server already started..will attemp to connect!")
+        else: # number means tereminated and need to start again
+            tkinter.messagebox.showinfo("No Server","No server running - please start this first!" )
+            return
+    except: # can occur first time server_status is checked since servercmd not defined
+        tkinter.messagebox.showinfo("No Server","No server running - please start this first!" )
+        return
+
     os.system("start /wait cmd /c bt_connect_only.bat")
     if sp_125_HS.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -830,7 +848,7 @@ def set_vol5():
 
 def set_vol19():
     """
-    use hex vale for the function of the volume setting!!!
+    This was changed from a static 19 setting to the FRONT DEFAULT volume setting
     """
 
     if not User_Connect:
@@ -838,16 +856,17 @@ def set_vol19():
         return
     global command_error
 
+    vf = format(int(default_volume_front), '02x')
     if Amp_THX_Present.get() or Amp_SONY_Present.get():
-        print("AMP Set Vol 19")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        print("AMP Set Vol Front = " + default_volume_front)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + vf], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
-        print("Set Vol GAP 19")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        print("Set Vol GAP Front = " + default_volume_front)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + vf], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
-        print("Set Vol 19")
+        print("Set Vol Front = " + default_volume_front)
         # os.system("start /wait cmd /c setVolumeX13.bat")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,13'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + vf], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -888,16 +907,17 @@ def set_vol22():
         return
     global command_error
 
+    vr = format(int(default_volume_rear), '02x')
     if Amp_THX_Present.get() or Amp_SONY_Present.get():
-        print("AMP Set Vol 22")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        print("AMP Set Vol Rear = " + default_volume_rear)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + vr], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
-        print("Set Vol GAP 22")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        print("Set Vol GAP Rear = " + default_volume_rear)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeFront,' + vr], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     else:
-        print("Set Vol 22")
+        print("Set Vol Rear = " + default_volume_rear)
         # os.system("start /wait cmd /c setVolumeX13.bat")
-        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,16'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        p=Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setVolumeX,' + vr], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     stdout, stderr = p.communicate()
     if stdout.find(b'Error') > 0:
@@ -1792,13 +1812,22 @@ class App:
         self.setVol16_b.place(rely=volume_y, relx=.32)
         setVol16_b_ttp = CreateToolTip(self.setVol16_b, "Use < and > to adjust the value of this button.")
 
-        self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green", height=2, width=6, font=font1)
+
+        self.setVol19_b = Button(master, text="Vol Front", command=set_vol19, fg="white", bg="lime", height=2, width=6, font=font1, wraplength=60)
         self.setVol19_b.pack()
         self.setVol19_b.place(rely=volume_y, relx=.48)
+        setVol19_b_ttp = CreateToolTip(self.setVol19_b, "Press to set the volume to FRONT default setting")
+        # self.setVol19_b = Button(master, text="Vol=19", command=set_vol19, fg="white", bg="green", height=2, width=6, font=font1)
+        # self.setVol19_b.pack()
+        # self.setVol19_b.place(rely=volume_y, relx=.48)
 
-        self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green", height=2, width=6, font=font1)
+        self.setVol22_b = Button(master, text="Vol Rear", command=set_vol22, fg="white", bg="lime", height=2, width=6, font=font1, wraplength=60)
         self.setVol22_b.pack()
         self.setVol22_b.place(rely=volume_y, relx=.64)
+        setVol22_b_ttp = CreateToolTip(self.setVol22_b, "Press to set the volume to REAR default setting")
+        # self.setVol22_b = Button(master, text="Vol=22", command=set_vol22, fg="white", bg="green", height=2, width=6, font=font1)
+        # self.setVol22_b.pack()
+        # self.setVol22_b.place(rely=volume_y, relx=.64)
 
         self.setVolX_b = Button(master, text="Set VolX", command=set_volX, fg="white", bg="green", height=2, width=7, font=font1)
         self.setVolX_b.pack()

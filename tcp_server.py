@@ -214,9 +214,11 @@ def doCommand(command):
                 i = command.find(",")  # added by LVB
                 logging.info("i = " + str(i))
                 if i > 12:
-                    print("Volume X=" + str(command[i + 1:]))
-                    new_data = volume_steps[int(command[i + 1:])]
+                    print("Volume X =" + str(command[i + 1:]))
+                    dec_step = int(str(command[i + 1:]), 16)
+                    new_data = volume_steps[dec_step]
                     command = command[:14]
+                    print("GAP vol = " + new_data)
 
         if command[:13] == "AMPsetVolumeX":
                 i = command.find(",")  # added by LVB
