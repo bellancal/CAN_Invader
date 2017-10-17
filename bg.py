@@ -646,7 +646,7 @@ def connect():
 
      # see if server already running but not connected
     try:
-        server_status = servercmd.poll()
+        server_status = sefrvercmd.poll()
         print ("Check server status = " + str(server_status) + "(None = running)")
         if server_status is None:
             print( "Server already started..will attemp to connect!")
@@ -729,6 +729,11 @@ def set_bass():
     if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set BASS =" + b)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    elif AHU_VistGap.get():
+        print("Set BassV=" + b)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassVisteon,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
+
     else:
         print("Set Bass=" + b)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
@@ -758,6 +763,11 @@ def set_treble():
     if Amp_THX_Present.get() or Amp_SONY_Present.get():
         print("AMP Set Treble =" + t)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
+    elif AHU_VistGap.get():
+        print("Set TrebleV=" + t)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebVisteon,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
     else:
         print("Set Treble=" + t)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
