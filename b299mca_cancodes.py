@@ -124,7 +124,7 @@ def cancodes_init(config_file):
                         "DID": 'fd2c',
                         "parameter": '03',
                         "access": '03',
-                        "data": '00'}
+                        "data": ''}
 
 
     # Sets the bass to maximum for Visteon
@@ -134,7 +134,7 @@ def cancodes_init(config_file):
                         "DID": 'fd2b',
                         "parameter": '03',
                         "access": '03',
-                        "data": '07'}
+                        "data": ''}
 
     # Sets the bass to value passed at function call
     # For Panasonic set DID fda3 AHU not fd2b

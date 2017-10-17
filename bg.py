@@ -646,7 +646,7 @@ def connect():
 
      # see if server already running but not connected
     try:
-        server_status = sefrvercmd.poll()
+        server_status = servercmd.poll()
         print ("Check server status = " + str(server_status) + "(None = running)")
         if server_status is None:
             print( "Server already started..will attemp to connect!")
@@ -694,7 +694,7 @@ def connect():
     else:
         User_Connect = False
         print("Failed to connect via BT!")
-        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure BlueTooth dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle diagnostic port.  Try unplugging and reconnecting CAN INVADER to vehicle." )
+        tkinter.messagebox.showinfo("Connection Error", "No BT connection made! Please check setup. Make sure BlueTooth dongle is attached to PC. Check that CAN Invader is in range and attached to vehicle diagnostic port. Make sure BT MAC address is correect in setup file. Try unplugging and reconnecting CAN INVADER to vehicle." )
         return False
 
 

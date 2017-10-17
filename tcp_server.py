@@ -268,6 +268,22 @@ def doCommand(command):
                     new_data = format(int(command[i+1:]) - 875, '02x')
                     command = command[:8]
 
+        if command[:14] == "setBassVisteon":
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 10:
+                    print("Bass Visteon X=" + str(command[i+1:]))
+                    new_data = command[i+1:]
+                    command = command[:14]
+
+        if command[:14] == "setTrebVisteon":
+                i = command.find(",")  # added by LVB
+                logging.info("i = " + str(i))
+                if i > 10:
+                    print("Treb Visteon X=" + str(command[i+1:]))
+                    new_data = command[i+1:]
+                    command = command[:14]
+
         # print("test line " + str(command)) #test line OK to remove later
         #load the data from the command defintions in the cancodes file
         ncommand = commands[command]
