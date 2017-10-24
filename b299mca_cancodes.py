@@ -122,7 +122,7 @@ def cancodes_init(config_file):
     set_treb_visteon = {"reqID": '727', #use for VisteonGAP V362
                         "cmd": '2e',
                         "DID": 'fd2c',
-                        "parameter": '03',
+                        "parameter": '', #leave blank for mode 2E
                         "access": '03',
                         "data": ''}
 
@@ -132,7 +132,7 @@ def cancodes_init(config_file):
     set_bass_visteon = {"reqID": '727', #use for VisteonGAP V362
                         "cmd": '2e',
                         "DID": 'fd2b',
-                        "parameter": '03',
+                        "parameter": '', #leave blank for mode 2E
                         "access": '03',
                         "data": ''}
 
