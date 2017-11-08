@@ -730,8 +730,19 @@ def set_bass():
         print("AMP Set BASS =" + b)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():
-        print("Set BassV=" + b)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassVisteon,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        #Convert b to signed integer'
+        #convert to decimal
+        ivalue= bass_scale.get()
+        if ivalue == "":
+            ivalue = '07'  # max
+        else:
+            ivalue = (tohex(ivalue,8))
+            ivalue = ivalue.replace('x', '')
+            ivalue = ivalue[-2:]
+
+
+        print("Set BassV=" + ivalue)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setBassVisteon,' + ivalue], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
 
     else:
@@ -745,6 +756,8 @@ def set_bass():
     else:
         command_error = False
 
+def tohex(val, nbits):
+  return hex((val + (1 << nbits)) % (1 << nbits))
 
 def set_treble():
     if not User_Connect:
@@ -765,8 +778,17 @@ def set_treble():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     elif AHU_VistGap.get():
-        print("Set TrebleV=" + t)
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebVisteon,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+
+        ivalue= treb_scale.get()
+        if ivalue == "":
+            ivalue = '07'  # max
+        else:
+            ivalue = (tohex(ivalue,8))
+            ivalue = ivalue.replace('x', '')
+            ivalue = ivalue[-2:]
+
+        print("Set TrebleV=" + ivalue)
+        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'setTrebVisteon,' + ivalue], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
     else:
         print("Set Treble=" + t)

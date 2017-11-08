@@ -119,7 +119,7 @@ def cancodes_init(config_file):
     # For Panasonic set other DID fda2
     # AHU spec Part2_Visteon_DS-F1BT-18C815-AB004-C1MCA.docx  says FDA2 - DAB Preset Data fda3 not used
 
-    set_treb_visteon = {"reqID": '727', #use for VisteonGAP V362
+    set_treb_visteon = {"reqID": '727', #use for VisteonGAP V362  SIGNED VALUE
                         "cmd": '2e',
                         "DID": 'fd2c',
                         "parameter": '', #leave blank for mode 2E
