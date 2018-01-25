@@ -1284,7 +1284,7 @@ def speaker_LF():
                 p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
             else: # with tweeters
                 p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
+    elif AHU_Pana.get() or AHU_PanaGap.get():
             print("Panasonic")
             # os.system("start /wait cmd /c speakerEnableLFtwt_Clarion.bat")
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1324,7 +1324,7 @@ def speaker_RF():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
+    elif AHU_Pana.get() or AHU_PanaGap.get():
         # os.system("start /wait cmd /c speakerEnableRFtwt_Panasonic.bat")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1361,7 +1361,7 @@ def speaker_LR():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableLR_Panasonic.bat")
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1396,7 +1396,7 @@ def speaker_RR():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableRR_Panasonic.bat")
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1428,7 +1428,7 @@ def speaker_All(check=True):  # check used to supress waring when used as AMP De
     elif AHU_Clar.get(): # works on P552
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4Clarion'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableAllOn4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1465,7 +1465,7 @@ def speaker_Center():
     elif AHU_Clar.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableCntrtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableCntrtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1499,7 +1499,7 @@ def speaker_Sub():
     elif AHU_Clar.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableSub4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Clarion.bat")
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableSub4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         # os.system("start /wait cmd /c speakerEnableAllOn_Panasonic.bat")
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1534,7 +1534,7 @@ def speaker_FrontOnly():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
+    elif AHU_Pana.get()or AHU_PanaGap.get():
 
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
@@ -1572,8 +1572,7 @@ def speaker_RearOnly():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-    elif AHU_Pana.get():
-
+    elif AHU_Pana.get()or AHU_PanaGap.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
@@ -2147,7 +2146,7 @@ AHU_menu.add_checkbutton(label="Panasonic", onvalue=True, offvalue=False, variab
 AHU_menu.add_checkbutton(label="Clarion", onvalue=True, offvalue=False, variable=AHU_Clar, command=AHU_changeC)
 AHU_menu.add_checkbutton(label="Visteon", onvalue=True, offvalue=False, variable=AHU_Vist, command=AHU_changeV)
 AHU_menu.add_checkbutton(label="Visteon-GAP", onvalue=True, offvalue=False, variable=AHU_VistGap, command=AHU_changeVGap)
-AHU_menu.add_checkbutton(label="Pana-GAP", onvalue=True, offvalue=False, variable=AHU_PanaGap, command=AHU_changePGap)
+AHU_menu.add_checkbutton(label="Pana-1DIN", onvalue=True, offvalue=False, variable=AHU_PanaGap, command=AHU_changePGap)
 menubar.add_cascade(label='AHU', menu=AHU_menu)
 
 # add Speaker Setup selection to menu bar
