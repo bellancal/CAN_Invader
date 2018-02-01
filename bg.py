@@ -643,7 +643,7 @@ def testerPoff():
 
 
 def connect():
-    global command_error
+    global command_error, CONNECTED_BUS_SPEED, CONNECTED_BUS_TYPE
     command_error = False
     print("BT connect")
 
@@ -664,15 +664,24 @@ def connect():
     if sp_125_HS.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 125 HS")
+        #todo: set connect status flags
+        CONNECTED_BUS_SPEED = "125"
+        CONNECTED_BUS_TYPE = "hs"
     elif sp_125_MS.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,125,ms'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 125 MS")
+        CONNECTED_BUS_SPEED = "125"
+        CONNECTED_BUS_TYPE = "ms"
     elif sp_500_MS.get():
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,ms'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         print("Set CAN 500 MS")
+        CONNECTED_BUS_SPEED = "500"
+        CONNECTED_BUS_TYPE = "ms"
     elif sp_500_HS.get():
         print("Set CAN 500 HS")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'configureCAN,500,hs'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+        CONNECTED_BUS_SPEED = "500"
+        CONNECTED_BUS_TYPE = "hs"
     else:
         print("Set CAN from ini")
         # no configuration chosen so use default in ini file
@@ -1613,8 +1622,15 @@ def speaker_RearOnly():
         command_error = False
 
 
+def CAN_setup0(): #500 HS
+    if User_Connect:
+        if (CONNECTED_BUS_SPEED == "500") and (CONNECTED_BUS_TYPE == "hs"):
+            sp_500_HS.set(True)
+        else:
+            sp_500_HS.set(False)
+            tkinter.messagebox.showinfo("CAN Config 500 HS Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
+        return
 
-def CAN_setup0():
     if sp_500_HS.get:
         sp_125_HS.set(False)
         sp_125_MS.set(False)
@@ -1624,7 +1640,15 @@ def CAN_setup0():
         print("CAN setup 0")
 
 
-def CAN_setup1():
+def CAN_setup1(): #125 HS
+    if User_Connect:  #and ((CONNECTED_BUS_SPEED != "None") or (CONNECTED_BUS_TYPE != "None"))
+        if (CONNECTED_BUS_SPEED == "125") and (CONNECTED_BUS_TYPE == "hs"):
+            sp_125_HS.set(True)
+        else:
+            sp_125_HS.set(False)
+            tkinter.messagebox.showinfo("CAN Config 125 HS Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
+        return
+
     if sp_125_HS.get:
         sp_125_HS.set(True)
         sp_125_MS.set(False)
@@ -1633,7 +1657,16 @@ def CAN_setup1():
         print("CAN setup 1")
 
 
-def CAN_setup2():
+def CAN_setup2(): #500 MS
+    if User_Connect:
+
+        if (CONNECTED_BUS_SPEED == "500") and (CONNECTED_BUS_TYPE == "ms"):
+            sp_500_MS.set(True)
+        else:
+            sp_500_MS.set(False)
+            tkinter.messagebox.showinfo("CAN Config 500 MS Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
+        return
+
     if sp_500_MS.get:
         sp_125_HS.set(False)
         sp_125_MS.set(False)
@@ -1641,8 +1674,16 @@ def CAN_setup2():
         sp_500_HS.set(False)
         print("CAN setup 2")
 
+def CAN_setup3(): # 125 MS
+    if User_Connect:
 
-def CAN_setup3():
+        if (CONNECTED_BUS_SPEED == "125") and (CONNECTED_BUS_TYPE == "ms"):
+            sp_125_MS.set(True)
+        else:
+            sp_125_MS.set(False)
+            tkinter.messagebox.showinfo("CAN Config 125 MS Not Implemented", "CAN speed or type change detected. You must disconnect and reconnect to make this effective!")
+        return
+
     if sp_125_MS.get:
         sp_125_HS.set(False)
         sp_125_MS.set(True)
