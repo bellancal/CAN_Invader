@@ -165,15 +165,15 @@ def CheckSpeaker():
     if cfg.has_section('SPEAKER'):
         sptype = cfg['SPEAKER']['TYPE']
         sptype = sptype.lower()
-        if sptype == '1':
+        if sptype == '1': #no tweeter
             Speaker1.set(True)
             Sp1_change()
             print("Speaker type 1")
-        elif sptype == '2':
+        elif sptype == '2': #with tweeter
             Speaker2.set(True)
             Sp2_change()
             print("Speaker type 2")
-        elif sptype == '3':
+        elif sptype == '3': #undefined
             Speaker3.set(True)
             print("Speaker type 3")
             Sp3_change()
@@ -1286,8 +1286,13 @@ def speaker_LF():
                 p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get() or AHU_PanaGap.get():
             print("Panasonic")
-            # os.system("start /wait cmd /c speakerEnableLFtwt_Clarion.bat")
-            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            if Speaker1.get(): # no tweeters
+                print("AHU=Pana, Speaker=1")
+                p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+            else: # with tweeters
+                print("AHU=Pana, Speaker=2/3")
+                # os.system("start /wait cmd /c speakerEnableLFtwt_Clarion.bat")
+                p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
             # print("Visteon")
             if Speaker1.get():
@@ -1326,7 +1331,12 @@ def speaker_RF():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get() or AHU_PanaGap.get():
         # os.system("start /wait cmd /c speakerEnableRFtwt_Panasonic.bat")
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        if Speaker1.get():
+            print("AHU=Pana, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("AHU=Pana, Speaker=2")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             print("AHU=Visteon, Speaker=1")
@@ -1362,8 +1372,13 @@ def speaker_LR():
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get()or AHU_PanaGap.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
-        # os.system("start /wait cmd /c speakerEnableLR_Panasonic.bat")
+        if Speaker1.get():
+            print("AHU=Pana, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("AHU=Pana, Speaker=2")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+
     elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableLR'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
@@ -1535,8 +1550,12 @@ def speaker_FrontOnly():
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get()or AHU_PanaGap.get():
-
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        if Speaker1.get():
+            print("AHU=Pana, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableF4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("AHU=Pana, Speaker=2")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableFtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             print("AHU=Visteon, Speaker=1")
@@ -1573,7 +1592,12 @@ def speaker_RearOnly():
         else:
             p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Pana.get()or AHU_PanaGap.get():
-        p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        if Speaker1.get():
+            print("AHU=Pana, Speaker=1")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableR4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
+        else:
+            print("AHU=Pana, Speaker=2")
+            p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'speakerEnableRtwt4'], creationflags=CREATE_NEW_CONSOLE, stdout=PIPE, stderr=PIPE)
     elif AHU_Vist.get() or AHU_VistGap.get():
         if Speaker1.get():
             print("AHU=Visteon, Speaker=1")
