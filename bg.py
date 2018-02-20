@@ -1750,6 +1750,7 @@ def Amp_SONY_Change():
         print("SONY AMP")
         Amp_THX_Present.set(False)
         Amp_SONY_Present.set(True)
+        Amp_HARMAN_Present.set(False)
 
 def Amp_THX_Change():
     print("AMP Change")
@@ -1757,6 +1758,15 @@ def Amp_THX_Change():
         print("THX AMP")
         Amp_THX_Present.set(True)
         Amp_SONY_Present.set(False)
+        Amp_HARMAN_Present.set(False)
+
+def Amp_HARMAN_Change():
+    print("AMP Change")
+    if Amp_HARMAN_Present.get():
+        print("HARMAN AMP")
+        Amp_THX_Present.set(False)
+        Amp_SONY_Present.set(False)
+        Amp_HARMAN_Present.set(True)
 
 def Sp1_change():
     if Speaker1.get():
@@ -2188,10 +2198,13 @@ Amp_THX_Present = tk.BooleanVar()
 Amp_THX_Present.set(False)
 Amp_SONY_Present = tk.BooleanVar()
 Amp_SONY_Present.set(False)
+Amp_HARMAN_Present = tk.BooleanVar()
+Amp_HARMAN_Present.set(False)
 
 Amp_menu = tk.Menu(menubar, background='white')
 Amp_menu.add_checkbutton(label="THX AMP", onvalue=True, offvalue=False, variable=Amp_THX_Present, command=Amp_THX_Change)
 Amp_menu.add_checkbutton(label="SONY AMP", onvalue=True, offvalue=False, variable=Amp_SONY_Present, command=Amp_SONY_Change)
+Amp_menu.add_checkbutton(label="HARMAN AMP", onvalue=True, offvalue=False, variable=Amp_HARMAN_Present, command=Amp_HARMAN_Change)
 menubar.add_cascade(label='AMP', menu=Amp_menu)
 
 # add AHU selection to menu bar

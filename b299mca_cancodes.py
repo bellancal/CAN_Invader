@@ -565,6 +565,80 @@ def cancodes_init(config_file):
                               "parameter": '03',
                               "access": '03',
                               "data": '7fffffffffffffff'}
+
+
+
+#***************************HARMAN AMP UPDATES FOR C159 - TESTED by SWEN KRON
+
+    # Enables left front speaker and left tweeter  4 bytes for Harman AMP
+    AMP_set_lf_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'f7 ff ff ff'}  # changed by Skron2 for C519 Harman AMP
+
+    AMP_set_front_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'f7 ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+
+    AMP_set_rear_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'f7 ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+
+    # Enables all speakers  4 bytes Harman AMP
+    AMP_set_all_on_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": '00 e3 ff ff'} # was  30fcffff   # changed by Skron2 for C519 Harman AMP
+
+# Enables only the right front speaker 4 bytes for THX AMP
+    AMP_set_rf_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'ef ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+
+# Enables only the right rear speaker 4 bytes for Harman AMP with tweeter
+    AMP_set_rr_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'fb ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+    # Enables only the left rear speaker 4 bytes for Harman AMP with tweeter
+    AMP_set_lr_on_twt_4_H = {"reqID": '783',
+                            "cmd": '2f',
+                            "DID": '8003',
+                            "parameter": '03',
+                            "access": '03',
+                            "data": 'fe ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+    #  Enables only the center speaker 4 bytes for Harman AMP
+    AMP_set_cntr_on_4_H = {"reqID": '783',
+                        "cmd": '2f',
+                        "DID": '8003',
+                        "parameter": '03',
+                        "access": '03',
+                        "data": 'ff ef ff ff'}         # changed by Skron2 for C519 Harman AMP
+
+
+   #  Enables only the subwoofer with Harman AMP (note 2 subwoofers both on)
+    AMP_set_subwoofer_on_4_H = {"reqID": '783',
+                                "cmd": '2f',
+                                "DID": '8003',
+                                "parameter": '03',
+                                "access": '03',
+                                "data": 'dd ff ff ff'}        # changed by Skron2 for C519 Harman AMP
+
 # ============================================================================================================
 # VIN READING ==============================================================================================
 
@@ -719,6 +793,15 @@ def cancodes_init(config_file):
                        "AMPspeakerEnableAllOn8": AMP_set_all_on_8,
                        "speakerEnableAllOn4Clarion" : set_all_on_4_Clarion,
                        "speakerEnableAllOn": set_all_on,
+                       "AMPspeakerEnableSub4H" :AMP_set_subwoofer_on_4_H,
+                       "AMPspeakerEnableAllOn4H" : AMP_set_all_on_4_H,
+                       "AMPspeakerEnableRtwt4H" : AMP_set_rear_on_twt_4_H,
+                       "AMPspeakerEnableFtwt4H" : AMP_set_front_on_twt_4_H,
+                       "AMPspeakerEnableCntrH" : AMP_set_cntr_on_4_H,
+                       "AMPspeakerEnableLRtwt4H" : AMP_set_lr_on_twt_4_H,
+                       "AMPspeakerEnableRRtwt4H" : AMP_set_rr_on_twt_4_H,
+                       "AMPspeakerEnableRFtwt4H" : AMP_set_rf_on_twt_4_H,
+                       "AMPspeakerEnableLFtwt4H": AMP_set_lf_on_twt_4_H,
                        "radioOn": radio_on,  # sends command to MFD
                        "radioOnSYNC": radio_on_sync,  # sends command to MFD
                        "radioOnahu": radio_on_ahu,  # GEN3 SYNC?
