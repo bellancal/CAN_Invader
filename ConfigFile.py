@@ -1,8 +1,7 @@
 """
 Created simple file to commonize source for the .ini file that is loaded across multiple modules
-Also defines the global variables passed between modules.
 This name below is the list of the available config files
-User can change the one that load on program intial run by setting the index value below in the CHANGE HERE section
+User can change the one that load on program initial run by setting the index value below in the CHANGE HERE section
 """
 
 # TODO: when user starts program from open - with the paths to the config files are not right.  If double click with set as default then paths are correct - why??
@@ -33,7 +32,8 @@ config_list2.append({"filename": "oobd_control_P552.ini", "displayname": "P552"}
 config_list2.append({"filename": "oobd_control_MKT_amp.ini", "displayname": "MKT"})  # index = 11 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
 config_list2.append({"filename": "oobd_control_V363.ini", "displayname": "Transit V363"})  # index = 12 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
 config_list2.append({"filename": "oobd_control_V362.ini", "displayname": "Transit V362"})  # index = 13 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
-config_list2.append({"filename": "test.ini", "displayname": "test only"})  # index = 14 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
+config_list2.append({"filename": "oobd_control_C519.ini", "displayname": "C519"})  # index = 14 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
+config_list2.append({"filename": "test.ini", "displayname": "test only"})  # index = 15 use 500 hs,clarion, tweeters sp=2, VIN=sync, pcm and rcm if ign  is on
 
 config_file_default = config_list2[index]["filename"]  # use index above in place of the number [x]
 
