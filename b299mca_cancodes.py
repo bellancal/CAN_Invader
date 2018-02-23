@@ -578,19 +578,21 @@ def cancodes_init(config_file):
                             "access": '03',
                             "data": 'f7 ff ff ff'}  # changed by Skron2 for C519 Harman AMP
 
+    # Enables left and right front speaker 4 bytes for Harman AMP
     AMP_set_front_on_twt_4_H = {"reqID": '783',
                             "cmd": '2f',
                             "DID": '8003',
                             "parameter": '03',
                             "access": '03',
-                            "data": 'f7 ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+                            "data": 'e7 ff ff ff'}       # changed by Skron2 for C519 Harman AMP
 
+    # Enables left and right rear speaker 4 bytes for Harman AMP
     AMP_set_rear_on_twt_4_H = {"reqID": '783',
                             "cmd": '2f',
                             "DID": '8003',
                             "parameter": '03',
                             "access": '03',
-                            "data": 'f7 ff ff ff'}       # changed by Skron2 for C519 Harman AMP
+                            "data": 'fa ff ff ff'}       # changed by Skron2 for C519 Harman AMP
 
     # Enables all speakers  4 bytes Harman AMP
     AMP_set_all_on_4_H = {"reqID": '783',

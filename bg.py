@@ -756,7 +756,7 @@ def set_bass():
     else:
         b = format(int(b) + 7, '02X')
 
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set BASS =" + b)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetBassX,' + b], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():
@@ -817,8 +817,7 @@ def set_treble():
     else:
         t = format(int(t) + 7,'02X')
 
-
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Treble =" + t)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetTrebX,' + t], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
 
@@ -894,7 +893,7 @@ def set_vol1():
 
     v = format(MasterVol1, '02x')
 
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Vol " + str(MasterVol1))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -917,7 +916,7 @@ def set_vol5():
         tkinter.messagebox.showinfo("No Connection", "Please connect to a CAN device")
         return
     global command_error
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Vol 5")
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,05'], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -947,7 +946,7 @@ def set_vol19():
     global command_error
 
     vf = format(int(default_volume_front), '02x')
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Vol Front = " + default_volume_front)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + vf], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -972,7 +971,7 @@ def set_vol16():
     global command_error
     v = format(MasterVol2, '02x')
 
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Vol" + str(MasterVol2))
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get():  # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -998,7 +997,7 @@ def set_vol22():
     global command_error
 
     vr = format(int(default_volume_rear), '02x')
-    if Amp_THX_Present.get() or Amp_SONY_Present.get():
+    if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
         print("AMP Set Vol Rear = " + default_volume_rear)
         p = Popen([sys.executable, "pynetcat.py", 'localhost', '50000', 'AMPsetVolumeX,' + vr], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
     elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -1031,7 +1030,7 @@ def set_volX():
     v = v_scale.get()
     if v != "":
         v = format(int(v), '02x')
-        if Amp_THX_Present.get() or Amp_SONY_Present.get():
+        if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
             print("AMP Set Vol X =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         elif AHU_VistGap.get(): # setvolfront command uses the vol lookup table to adjust the volume steps
@@ -1066,7 +1065,7 @@ def set_vol_default(v_dec):
     # convert to hex for command as ini file is NOT in hex format!!
     v = format(int(v_dec), '02x')
     if v != "":
-        if Amp_THX_Present.get() or Amp_SONY_Present.get():
+        if Amp_THX_Present.get() or Amp_SONY_Present.get() or Amp_HARMAN_Present.get():
             print("AMP Set Vol Default =" + v)
             p = Popen([sys.executable, "pynetcat.py",'localhost','50000','AMPsetVolumeX,' + v], creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
         elif AHU_VistGap.get():
